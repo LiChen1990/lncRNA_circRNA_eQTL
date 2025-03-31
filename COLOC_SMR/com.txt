@@ -1,0 +1,16 @@
+### SMR
+smr_Linux --bfile $bfile  --gwas-summary $GWAS_summary_file  --beqtl-summary $eQTL_summary_file --out $name_1  --thread-num 10 --diff-freq 0.1 --diff-freq-prop 0.95  --heidi-mtd 1  --peqtl-smr 5e-8 --ld-upper-limit 0.9 --ld-lower-limit 0.05 --peqtl-heidi 1.57e-3 --heidi-min-m 3 --heidi-max-m 20 --cis-wind 2000 
+smr_Linux --bfile $bfile  --gwas-summary $GWAS_summary_file  --beqtl-summary $eQTL_summary_file --out $name_1.multi  --thread-num 10 --diff-freq 0.1 --diff-freq-prop 0.95  --heidi-mtd 1  --peqtl-smr 5e-8 --ld-upper-limit 0.9 --ld-lower-limit 0.05 --peqtl-heidi 1.57e-3 --heidi-min-m 3 --heidi-max-m 20 --cis-wind 2000 --smr-multi --set-wind 500  --ld-multi-snp 0.1 
+
+### COLOC
+Rscript $bin_path/ColocAnalysisQ.R  ${name_1}_COLOC_INPUT.txt ${name_1}.coloc  2865  $list_cnt[0]   
+Rscript $bin_path/ColocAnalysisCC.R  ${name_1}_COLOC_INPUT.txt ${name_1}.coloc  2865  $list_cnt[0]  $list_cnt[1]  
+
+### OPERA
+/storage/yangjianLab/chenli/softwares/OPERA-main/opera_Linux --besd-flist mylist --gwas-summary mygwas.ma --bfile mydata --estimate-pi --out myopera
+
+### TWAS
+$PLINK --bfile $geno$Chr --pheno $TargetID.pheno --make-bed --out $TargetID --keep $TargetID.pheno --chr $Chr --from-bp $P0 --to-bp $P1 --extract $LDREF/1000G.EUR.$Chr.bim
+Rscript $bin_path/FUSION.compute_weights.R   --bfile $TargetID --pheno $TargetID.pheno --hsq_p 0.01 --crossval 5  --tmp ./$TargetID --out ./WEIGHTS/$TargetID  --PATH_gcta $GCTA --PATH_gemma $GEMMA  --PATH_plink  $PLINK  --models bslmm,lasso,top1,enet
+
+
