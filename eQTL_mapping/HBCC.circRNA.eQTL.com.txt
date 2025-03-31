@@ -1,0 +1,533 @@
+/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL1  ### CPM
+ 
+sed -e 's/^chr//'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/circRNA.ciri.bed  > circRNA_HBCC.ciri.bed 
+
+cut -f1,1 HBCC_129samples_cov.txt | sed  -e '1,1d'  > HBCC.129samples.txt
+cut -f1,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.1.txt
+cut -f2,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.2.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.exp.txt    HBCC.129samples.txt  > newlncRNA_exp.exp2.txt 
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.bsj.txt  HBCC.129samples.txt > newlncRNA_exp.bsj.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.ratio.txt  HBCC.129samples.txt  > newlncRNA_exp.ratio.txt
+
+
+perl  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/get_subgenes_exp.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.exp.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.txt > circRNA.exp.eQTL.all.txt
+sed -i -e  's/_R1_val_1.CIRIquant.table//g'  circRNA.exp.eQTL.all.txt 
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl circRNA.exp.eQTL.all.txt   HBCC.129samples.txt  > circRNA.exp.eQTL.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  circRNA.exp.eQTL.txt  > newlncRNA_exp.eQTL.title2.txt 
+ 
+
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.eQTL.title2.txt   newlncRNA_exp.INT.txt 
+
+sed -i -e '1,1 s/^id\t//'  newlncRNA_exp.eQTL.title2.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   circRNA_HBCC.ciri.bed newlncRNA_exp.eQTL.title2.txt   > newlncRNA_exp.INT.bed 
+
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/run_PEER.R  --max_iter 3000  --covariates /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1/covar3_transpose.PEER.txt  newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp.PEER1  15
+#Maximum number of iterations reached: 1000
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.PEER1.PEER_residuals.txt   newlncRNA_exp.PEER1.PEER_residuals.INT.txt  
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl circRNA_HBCC.ciri.bed  newlncRNA_exp.PEER1.PEER_residuals.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+
+
+###GB voom method
+
+/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL1
+
+perl  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/get_subgenes_exp.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.bsj.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.txt > circRNA.exp.eQTL.all.bsj.txt
+sed -i -e '1,1 s/_R1_val_1.CIRIquant.table//g'  circRNA.exp.eQTL.all.bsj.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl circRNA.exp.eQTL.all.bsj.txt  HBCC.129samples.txt  > circRNA.exp.eQTL.bsj.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  circRNA.exp.eQTL.bsj.txt    > newlncRNA_exp.eQTL.title2.bsj.txt 
+sed -i -e '1,1 s/^id\t//'  newlncRNA_exp.eQTL.title2.bsj.txt
+
+
+
+library(limma)
+library(edgeR)
+
+setwd("/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL1")
+ 
+
+calcResiduals <- function(geneBySampleValues, samplesByCovariates, varsToAddBackIn=NULL, sampleWeights=NULL) {
+  #################################################################################
+  # "Recursively" use the calcResiduals() code after this section (in a for loop):
+  #################################################################################
+  if (is.matrix(sampleWeights)) {
+    residualizedMat = matrix(NA, nrow=nrow(geneBySampleValues), ncol=ncol(geneBySampleValues), dimnames=dimnames(geneBySampleValues))
+    for (gInd in 1:nrow(geneBySampleValues)) {
+      gRow = calcResiduals(geneBySampleValues[gInd, , drop=FALSE], samplesByCovariates, varsToAddBackIn, sampleWeights[gInd, ])
+      residualizedMat[gInd, ] = gRow
+    }
+    return(residualizedMat)
+  }
+  #################################################################################
+  
+  #result.lm = lsfit(x=samplesByCovariates, y=t(geneBySampleValues), wt=sampleWeights, intercept=FALSE)
+  
+  # Formula of "y ~ 0 + x" means no intercept:
+  result.lm = lm(t(geneBySampleValues) ~ 0 + samplesByCovariates, weights=sampleWeights)
+  covarNames = colnames(samplesByCovariates)
+  
+  coef = result.lm$coefficients
+  isMatrixForm = is.matrix(coef)
+  if (isMatrixForm) {
+    rownames(coef) = covarNames
+  }
+  else {
+    names(coef) = covarNames
+  }
+  
+  allVarsToAddBack = '(Intercept)'
+  allVarsToAddBack = c(allVarsToAddBack, varsToAddBackIn)
+  allVarsToAddBack = intersect(allVarsToAddBack, covarNames)
+  
+  residualizedMat = result.lm$residuals
+  if (isMatrixForm) {
+    multCoef = coef[allVarsToAddBack, , drop=FALSE]
+  }
+  else {
+    multCoef = coef[allVarsToAddBack]
+  }
+  residualizedMat = residualizedMat + samplesByCovariates[, allVarsToAddBack, drop=FALSE] %*% multCoef
+  
+  residualizedMat = t(residualizedMat)
+  rownames(residualizedMat) = rownames(geneBySampleValues)
+  colnames(residualizedMat) = colnames(geneBySampleValues)
+  
+  return(residualizedMat)
+}  
+
+setwd("/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1")
+selected_sample<-readLines("HBCC.129samples.2.txt")
+cov_file<-"HBCC_129samples_cov.txt"
+cov_data=read.table(cov_file,head=T,stringsAsFactors=F,sep="\t")
+index=match(cov_data$individualID,selected_sample,nomatch=0)
+covs=cov_data[which(index!=0),-c(1,2,3,4,13)]
+ID=cov_data[which(index!=0),2]
+rownames(covs)=ID
+covs$ID<-ID
+
+index=which(covs$ageDeath=="90+")
+covs$ageDeath[index]=90
+covs$ageDeath=as.numeric(covs$ageDeath)
+index=which(is.na(covs$PMI))
+if(length(index)>0){
+	covs$PMI[index]=mean(covs$PMI[-index])
+}
+sex <- as.factor(covs$sex)
+diagnosis <- as.factor(covs$diagnosis)
+WGS_platform <- as.factor(covs$WGS_platform)
+cov_data2=data.frame(covs[,c("ID","PMI","RIN","pH","ageDeath")],WGS_platform,sex,diagnosis)
+cov_data2[c("CMC_HBCC_432"),]
+
+PCs<-read.table("HBCC_EUR.eigenvec",sep=" ",header=F)
+PCs<-PCs[,2:ncol(PCs)]
+colnames(PCs)<-c("ID",paste("PC",seq(1,20),sep=""))
+row.names(PCs)<-PCs$ID
+PCs[c("CMC_HBCC_432"),]
+
+dat_cov1<-merge(PCs,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+write.table(file="covar3_transpose.PEER.txt",dat_cov1,col.names = TRUE, row.names = TRUE, quote = FALSE,sep="\t")
+dat_cov1[c("CMC_HBCC_432"),]
+
+
+PEER<-read.table("newlncRNA_exp.PEER1.PEER_covariates.txt",sep="\t",header=T)
+row.names(PEER)<-PEER$ID
+PEER<-PEER[,-1]
+PEER<-t(PEER)
+PEER<-data.frame(ID=row.names(PEER),PEER)
+rownames(PEER)<-PEER$ID
+PEER[c("CMC_HBCC_432"),]
+
+
+dat_cov<-merge(merge(PCs,PEER,by="ID"),cov_data2,by="ID")
+row.names(dat_cov)<-dat_cov$ID
+dat_cov[c("CMC_HBCC_432"),]
+dat_cov<-dat_cov[,-1]
+dat_cov<-dat_cov[selected_sample,]
+dat_cov[c("CMC_HBCC_432"),]
+
+coldata<-dat_cov
+summary(coldata)
+
+
+setwd("/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL1")
+CIRI.JUNCTION.mat<-read.table(file="newlncRNA_exp.eQTL.title2.bsj.txt",sep="\t",header=T);
+colnames(CIRI.JUNCTION.mat)<-gsub("\\.","-",colnames(CIRI.JUNCTION.mat))
+CIRI.JUNCTION.depth=colSums(CIRI.JUNCTION.mat)
+CIRI.JUNCTION.depth[which(CIRI.JUNCTION.depth==0)]=median(CIRI.JUNCTION.depth)
+
+coldata<-coldata[colnames(CIRI.JUNCTION.mat),]
+
+CIRI.JUNCTION.PASS.DEG=DGEList(CIRI.JUNCTION.mat, lib.size = CIRI.JUNCTION.depth, genes=rownames(CIRI.JUNCTION.mat))
+CIRI.JUNCTION.PASS.CPM=cpm(CIRI.JUNCTION.PASS.DEG)
+Circ.design.all1=model.matrix(data=coldata, as.formula("~ . "))
+rownames(Circ.design.all1)=colnames(CIRI.JUNCTION.mat)
+CIRI.JUNCTION.PASS.voom=voom(CIRI.JUNCTION.PASS.DEG,design=Circ.design.all1)
+CIRI.JUNCTION.PASS.voom.log=CIRI.JUNCTION.PASS.voom$E
+CIRI.JUNCTION.PASS.voom.weight=CIRI.JUNCTION.PASS.voom$weights
+CIRI.JUNCTION.PASS.voom.log.Mean=rowMeans(CIRI.JUNCTION.PASS.voom.log)
+CIRI.JUNCTION.PASS.voom.log.Res=calcResiduals(CIRI.JUNCTION.PASS.voom.log,Circ.design.all1,sampleWeights = CIRI.JUNCTION.PASS.voom.weight)
+CIRI.JUNCTION.PASS.voom.log.Res[c("chr12:938228|939110"),c("CMC_HBCC_432")]
+CIRI.JUNCTION.PASS.voom.log[c("chr12:938228|939110"),c("CMC_HBCC_432")]
+CIRI.JUNCTION.PASS.voom.log.Res[c("chr1:21076216|21100103"),c("CMC_HBCC_432")] 
+CIRI.JUNCTION.PASS.voom.log[c("chr1:21076216|21100103"),c("CMC_HBCC_432")]
+write.table(CIRI.JUNCTION.PASS.voom.log.Res,"CIRI.JUNCTION.PASS.voom.log.Res.txt",row.names = T,col.names = T,sep="\t" ,quote=F)
+write.table(CIRI.JUNCTION.PASS.voom.log,"CIRI.JUNCTION.PASS.voom.log.txt",row.names = T,col.names = T,sep="\t" ,quote=F)
+write.table(CIRI.JUNCTION.PASS.voom.log.Mean,"CIRI.JUNCTION.PASS.voom.log.Mean.txt",row.names = T,col.names = T,sep="\t" ,quote=F)
+
+ 
+sed -i -e '1,1 s/^/id\t/'  CIRI.JUNCTION.PASS.voom.log.Res.txt 
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R CIRI.JUNCTION.PASS.voom.log.Res.txt   CIRI.JUNCTION.PASS.voom.log.Res.INT.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl circRNA_HBCC.ciri.bed   CIRI.JUNCTION.PASS.voom.log.Res.INT.txt    > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed CIRI.JUNCTION.PASS.voom.log.Res.INT.txt   > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz
+
+
+
+conda activate  /storage/yangjianLab/chenli/softwares/condalocal/python38  
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe   newlncRNA_exp.INT.sort1.bed.gz   newlncRNA_exp
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_cisQTL.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe   newlncRNA_exp.INT.sort1.bed.gz   newlncRNA_exp
+
+for chr in {1..22}; do \
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/one_2_queryformat_tensorQTL.pl   newlncRNA_exp.cis_qtl_pairs.${chr}.parquet.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe.bim   circRNA_HBCC.ciri.bed  1  >  HBCC.circRNAeQTL.query.full.chr${chr}.txt; \
+smr_Linux --qfile  HBCC.circRNAeQTL.query.full.chr${chr}.txt  --make-besd --out   HBCC.circRNAeQTL.query.full.chr${chr} ; \ 
+done
+
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/merge_files_2_queryformat_tensorQTL.pl    filelist.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe.bim  circRNA_HBCC.ciri.bed  1  >  HBCC.circRNAeQTL.query.txt 
+smr_Linux --qfile  HBCC.circRNAeQTL.query.txt    --make-besd --out HBCC.circRNAeQTL.cis
+
+
+
+
+
+library(qvalue)
+setwd("/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL2")
+D<-data.frame()
+for (x in 1:22) {
+  filename<-paste("newlncRNA_exp.map_cis.",x,".txt",sep="")
+  data2 = read.table(filename,header=T, stringsAsFactors=FALSE)
+  D<-rbind(D,data2)
+}
+
+
+Q <- qvalue(D$pval_beta)
+cat("  * Proportion of significant phenotypes =" , round((1 - Q$pi0) * 100, 2), "%\n")
+D<-data.frame(D,qval=Q$qvalues)
+write.table(D, "all.cis_qtl.txt", quote=FALSE, sep="\t",row.names=FALSE, col.names=T)
+awk '{if($17<=0.05) {print $0 }}'  all.cis_qtl.txt | more 
+
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-5
+filelist.txt	lncRNA	574	PCG	574
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$ 
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-6
+filelist.txt	lncRNA	62	PCG	62
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$ 
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-7
+filelist.txt	lncRNA	5	PCG	5
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$ 
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$  perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-4 
+filelist.txt	lncRNA	3921	PCG	3921
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel085 eQTL1]$  perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-8
+filelist.txt	lncRNA	0	PCG	0
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  1
+filelist.txt	lncRNA	9690	PCG	9690
+
+
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.1.parquet.txt | wc -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.2.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.3.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.4.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.5.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.6.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.7.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.8.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.9.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.10.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.11.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.12.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.13.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.14.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.15.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.16.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.17.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.18.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.19.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.20.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.21.parquet.txt | wc  -l 
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL1/newlncRNA_exp.cis_qtl_pairs.22.parquet.txt | wc  -l 
+                                                                                                                        
+                                                                                                                         
+
+/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL2  ## ratio 
+
+
+sed -e 's/^chr//'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/circRNA.ciri.bed  > circRNA_HBCC.ciri.bed 
+
+cut -f1,1 HBCC_129samples_cov.txt | sed  -e '1,1d'  > HBCC.129samples.txt
+cut -f1,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.1.txt
+cut -f2,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.2.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.exp.txt    HBCC.129samples.txt  > newlncRNA_exp.exp2.txt 
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.bsj.txt  HBCC.129samples.txt > newlncRNA_exp.bsj.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.ratio.txt  HBCC.129samples.txt  > newlncRNA_exp.ratio.txt
+
+
+
+perl  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/get_subgenes_exp.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.ratio.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.txt > circRNA.exp.eQTL.all.txt
+sed -i -e  's/_R1_val_1.CIRIquant.table//g'  circRNA.exp.eQTL.all.txt 
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl circRNA.exp.eQTL.all.txt  HBCC.129samples.txt  > circRNA.exp.eQTL.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt circRNA.exp.eQTL.txt  > newlncRNA_exp.eQTL.title2.txt 
+
+ 
+sed -i -e '1,1 s/^id\t//'   newlncRNA_exp.eQTL.title2.txt
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/quantile_normalisation.R    newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.QN.txt 
+sed -i -e '1,1 s/^/id\t/'  newlncRNA_exp.QN.txt  
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.QN.txt  newlncRNA_exp.INT.txt 
+
+
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   circRNA_HBCC.ciri.bed newlncRNA_exp.QN.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz  
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/run_PEER.R  --max_iter 3000  --covariates /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1/covar3_transpose.PEER.txt  newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp.PEER1  15
+#Maximum number of iterations reached: 1000 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.PEER1.PEER_residuals.txt   newlncRNA_exp.PEER1.PEER_residuals.INT.txt  
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   circRNA_HBCC.ciri.bed    newlncRNA_exp.PEER1.PEER_residuals.txt   > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+
+###GB voom method
+
+/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL2
+
+perl  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/get_subgenes_exp.pl /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.ratio.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/list.txt > circRNA.exp.eQTL.all.ratio.txt
+sed -i -e '1,1 s/_R1_val_1.CIRIquant.table//g'  circRNA.exp.eQTL.all.ratio.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl circRNA.exp.eQTL.all.ratio.txt  HBCC.129samples.txt  > circRNA.exp.eQTL.ratio.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  circRNA.exp.eQTL.ratio.txt    > newlncRNA_exp.eQTL.title2.ratio.txt 
+sed -i -e '1,1 s/^id\t//'  newlncRNA_exp.eQTL.title2.ratio.txt
+
+
+
+library(limma)
+library(edgeR)
+
+setwd("/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL2")
+ 
+
+calcResiduals <- function(geneBySampleValues, samplesByCovariates, varsToAddBackIn=NULL, sampleWeights=NULL) {
+  #################################################################################
+  # "Recursively" use the calcResiduals() code after this section (in a for loop):
+  #################################################################################
+  if (is.matrix(sampleWeights)) {
+    residualizedMat = matrix(NA, nrow=nrow(geneBySampleValues), ncol=ncol(geneBySampleValues), dimnames=dimnames(geneBySampleValues))
+    for (gInd in 1:nrow(geneBySampleValues)) {
+      gRow = calcResiduals(geneBySampleValues[gInd, , drop=FALSE], samplesByCovariates, varsToAddBackIn, sampleWeights[gInd, ])
+      residualizedMat[gInd, ] = gRow
+    }
+    return(residualizedMat)
+  }
+  #################################################################################
+  
+  #result.lm = lsfit(x=samplesByCovariates, y=t(geneBySampleValues), wt=sampleWeights, intercept=FALSE)
+  
+  # Formula of "y ~ 0 + x" means no intercept:
+  result.lm = lm(t(geneBySampleValues) ~ 0 + samplesByCovariates, weights=sampleWeights)
+  covarNames = colnames(samplesByCovariates)
+  
+  coef = result.lm$coefficients
+  isMatrixForm = is.matrix(coef)
+  if (isMatrixForm) {
+    rownames(coef) = covarNames
+  }
+  else {
+    names(coef) = covarNames
+  }
+  
+  allVarsToAddBack = '(Intercept)'
+  allVarsToAddBack = c(allVarsToAddBack, varsToAddBackIn)
+  allVarsToAddBack = intersect(allVarsToAddBack, covarNames)
+  
+  residualizedMat = result.lm$residuals
+  if (isMatrixForm) {
+    multCoef = coef[allVarsToAddBack, , drop=FALSE]
+  }
+  else {
+    multCoef = coef[allVarsToAddBack]
+  }
+  residualizedMat = residualizedMat + samplesByCovariates[, allVarsToAddBack, drop=FALSE] %*% multCoef
+  
+  residualizedMat = t(residualizedMat)
+  rownames(residualizedMat) = rownames(geneBySampleValues)
+  colnames(residualizedMat) = colnames(geneBySampleValues)
+  
+  return(residualizedMat)
+}  
+
+setwd("/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1")
+selected_sample<-readLines("HBCC.129samples.2.txt")
+cov_file<-"HBCC_129samples_cov.txt"
+cov_data=read.table(cov_file,head=T,stringsAsFactors=F,sep="\t")
+index=match(cov_data$individualID,selected_sample,nomatch=0)
+covs=cov_data[which(index!=0),-c(1,2,3,4,13)]
+ID=cov_data[which(index!=0),2]
+rownames(covs)=ID
+covs$ID<-ID
+
+index=which(covs$ageDeath=="90+")
+covs$ageDeath[index]=90
+covs$ageDeath=as.numeric(covs$ageDeath)
+index=which(is.na(covs$PMI))
+if(length(index)>0){
+	covs$PMI[index]=mean(covs$PMI[-index])
+}
+sex <- as.factor(covs$sex)
+diagnosis <- as.factor(covs$diagnosis)
+WGS_platform <- as.factor(covs$WGS_platform)
+cov_data2=data.frame(covs[,c("ID","PMI","RIN","pH","ageDeath")],WGS_platform,sex,diagnosis)
+cov_data2[c("CMC_HBCC_432"),]
+
+PCs<-read.table("HBCC_EUR.eigenvec",sep=" ",header=F)
+PCs<-PCs[,2:ncol(PCs)]
+colnames(PCs)<-c("ID",paste("PC",seq(1,20),sep=""))
+row.names(PCs)<-PCs$ID
+PCs[c("CMC_HBCC_432"),]
+
+dat_cov1<-merge(PCs,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+write.table(file="covar3_transpose.PEER.txt",dat_cov1,col.names = TRUE, row.names = TRUE, quote = FALSE,sep="\t")
+dat_cov1[c("CMC_HBCC_432"),]
+
+
+PEER<-read.table("newlncRNA_exp.PEER1.PEER_covariates.txt",sep="\t",header=T)
+row.names(PEER)<-PEER$ID
+PEER<-PEER[,-1]
+PEER<-t(PEER)
+PEER<-data.frame(ID=row.names(PEER),PEER)
+rownames(PEER)<-PEER$ID
+PEER[c("CMC_HBCC_432"),]
+
+
+dat_cov<-merge(merge(PCs,PEER,by="ID"),cov_data2,by="ID")
+row.names(dat_cov)<-dat_cov$ID
+dat_cov[c("CMC_HBCC_432"),]
+dat_cov<-dat_cov[,-1]
+dat_cov<-dat_cov[selected_sample,]
+dat_cov[c("CMC_HBCC_432"),]
+
+coldata<-dat_cov
+summary(coldata)
+
+
+setwd("/storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/HBCC/merge/eQTL2")
+CIRI.JUNCTION.mat<-read.table(file="newlncRNA_exp.eQTL.title2.ratio.txt",sep="\t",header=T);
+
+coldata<-coldata[colnames(CIRI.JUNCTION.mat),]
+Circ.design.all1=model.matrix(data=coldata, as.formula("~ . "))
+rownames(Circ.design.all1)=colnames(CIRI.JUNCTION.mat)
+
+CIRI.JUNCTION.PASS.voom.log.Res=calcResiduals(CIRI.JUNCTION.mat,Circ.design.all1)
+CIRI.JUNCTION.PASS.voom.log.Res[c("chr12:938228|939110"),c("CMC_HBCC_432")]
+CIRI.JUNCTION.PASS.voom.log.Res[c("chr1:21076216|21100103"),c("CMC_HBCC_432")] 
+write.table(CIRI.JUNCTION.PASS.voom.log.Res,"CIRI.JUNCTION.PASS.voom.log.Res.txt",row.names = T,col.names = T,sep="\t" ,quote=F)
+
+
+ 
+sed -i -e '1,1 s/^/id\t/'  CIRI.JUNCTION.PASS.voom.log.Res.txt 
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R CIRI.JUNCTION.PASS.voom.log.Res.txt   CIRI.JUNCTION.PASS.voom.log.Res.INT.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl circRNA_HBCC.ciri.bed   CIRI.JUNCTION.PASS.voom.log.Res.INT.txt    > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed CIRI.JUNCTION.PASS.voom.log.Res.INT.txt   > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz
+
+
+
+conda activate  /storage/yangjianLab/chenli/softwares/condalocal/python38  
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe   newlncRNA_exp.INT.sort1.bed.gz   newlncRNA_exp
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_cisQTL.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe   newlncRNA_exp.INT.sort1.bed.gz   newlncRNA_exp
+ 
+ 
+for chr in {1..22}; do \
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/one_2_queryformat_tensorQTL.pl   newlncRNA_exp.cis_qtl_pairs.${chr}.parquet.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe.bim   circRNA_HBCC.ciri.bed  1  >  HBCC.circRNAeQTL.query.full.chr${chr}.txt; \
+smr_Linux --qfile  HBCC.circRNAeQTL.query.full.chr${chr}.txt  --make-besd --out   HBCC.circRNAeQTL.query.full.chr${chr} ; \ 
+done
+
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/merge_files_2_queryformat_tensorQTL.pl    filelist.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe.bim  circRNA_HBCC.ciri.bed  1  >  HBCC.circRNAeQTL.query.txt 
+smr_Linux --qfile  HBCC.circRNAeQTL.query.txt    --make-besd --out HBCC.circRNAeQTL.cis
+
+
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-8
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  1
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-4
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-5
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-6
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-7
+
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-5
+filelist.txt	lncRNA	583	PCG	583
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ 
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-6
+filelist.txt	lncRNA	68	PCG	68
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ 
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-7
+filelist.txt	lncRNA	6	PCG	6
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ 
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-4
+filelist.txt	lncRNA	3987	PCG	3987
+(/storage/yangjianLab/chenli/softwares/condalocal/python38) [chenli@intel054 eQTL2]$ perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/circRNA_HBCC_CIRI.bed.id.txt  5e-8
+filelist.txt	lncRNA	2	PCG	2  
+
+
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.1.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.2.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.3.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.4.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.5.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.6.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.7.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.8.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.9.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.10.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.11.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.12.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.13.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.14.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.15.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.16.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.17.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.18.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.19.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.20.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.21.parquet.txt | more
+awk '{if($7<=5e-8 ) print $0}'  /storage/yangjianLab/chenli/softwares/circRNA/Test_CMC/test_pipeline/CMC_all_ciri/merge/eQTL2/newlncRNA_exp.cis_qtl_pairs.22.parquet.txt | more
