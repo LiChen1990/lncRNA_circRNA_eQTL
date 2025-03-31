@@ -1,0 +1,423 @@
+######new lncRNA HBCC, 60 PEER, COUNT, RESIUALs
+/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/filter_low_expressed_genes3.pl /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/newlncRNA_STARRSEMexp/gencode.v37lift37.genes.collapsed.lncRNA.TPM.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/newlncRNA_STARRSEMexp/gencode.v37lift37.genes.collapsed.lncRNA.fragments.txt  0.1  0.2  6  0.2  2 > newlncRNA_exp.eQTL.txt
+
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/TMM.R newlncRNA_exp.eQTL.txt  newlncRNA_exp.TMM.txt 
+
+perl   /storage/yangjianLab/chenli/scripts/lncRNApipe/gtf2bed.pl /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/gencode.v37lift37.genes.collapsed.PsychENCODElncRNA.gtf    gene  >  newlncRNA_exp.GeneLncRNA.hg19.bed 
+sed -i -e 's/^chr//'   newlncRNA_exp.GeneLncRNA.hg19.bed 
+
+cut -f1,1 HBCC_129samples_cov.txt | sed  -e '1,1d'  > HBCC.129samples.txt
+cut -f1,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.1.txt
+cut -f2,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.2.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl newlncRNA_exp.TMM.txt  HBCC.129samples.txt   > newlncRNA_exp.exp2.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  newlncRNA_exp.exp2.txt  > newlncRNA_exp.eQTL.title2.txt 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt 
+##cp newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt  
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   newlncRNA_exp.GeneLncRNA.hg19.bed   newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+####Run R code below: Rscript generate_covar_BrainGVEx.R
+selected_sample<-readLines("HBCC.129samples.2.txt")
+cov_file<-"HBCC_129samples_cov.txt"
+cov_data=read.table(cov_file,head=T,stringsAsFactors=F,sep="\t")
+index=match(cov_data$individualID,selected_sample,nomatch=0)
+covs=cov_data[which(index!=0),-c(1,2,3,4,13)]
+ID=cov_data[which(index!=0),2]
+rownames(covs)=ID
+covs$ID<-ID
+
+index=which(covs$ageDeath=="90+")
+covs$ageDeath[index]=90
+covs$ageDeath=as.numeric(covs$ageDeath)
+index=which(is.na(covs$PMI))
+if(length(index)>0){
+	covs$PMI[index]=mean(covs$PMI[-index])
+}
+sex <- model.matrix(~as.factor(covs$sex))[,-1]
+diagnosis <- model.matrix(~as.factor(covs$diagnosis))[,-1]
+WGS_platform <- model.matrix(~as.factor(covs$WGS_platform))[,-1]
+cov_data2=data.frame(covs[,c("ID","PMI","RIN","pH","ageDeath")],WGS_platform,sex,diagnosis)
+cov_data2[c("CMC_HBCC_432"),]
+
+PCs<-read.table("HBCC_EUR.eigenvec",sep=" ",header=F)
+PCs<-PCs[,2:ncol(PCs)]
+colnames(PCs)<-c("ID",paste("PC",seq(1,20),sep=""))
+row.names(PCs)<-PCs$ID
+PCs[c("CMC_HBCC_432"),]
+
+dat_cov1<-merge(PCs,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+write.table(file="covar3_transpose.PEER.txt",dat_cov1,col.names = TRUE, row.names = TRUE, quote = FALSE,sep="\t")
+dat_cov1[c("CMC_HBCC_432"),]
+
+
+PEER<-read.table("newlncRNA_exp.PEER1.PEER_covariates.txt",sep="\t",header=T)
+row.names(PEER)<-PEER$ID
+PEER<-PEER[,-1]
+PEER<-t(PEER)
+PEER<-data.frame(ID=row.names(PEER),PEER)
+rownames(PEER)<-PEER$ID
+PEER[c("CMC_HBCC_432"),]
+
+
+dat_cov<-merge(merge(PCs,PEER,by="ID"),cov_data2,by="ID")
+row.names(dat_cov)<-dat_cov$ID
+dat_cov[c("CMC_HBCC_432"),]
+dat_cov<-dat_cov[,-1]
+dat_cov<-dat_cov[selected_sample,]
+dat_cov<-t(dat_cov)
+dat_cov<-data.frame(ID=row.names(dat_cov),dat_cov)
+write.table(file="covar3_transpose.txt",dat_cov,col.names = TRUE, row.names = FALSE, quote = FALSE,sep="\t")
+dat_cov[,c("CMC_HBCC_432")]
+
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/run_PEER.R --covariates covar3_transpose.PEER.txt  newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp.PEER1  15 
+
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.PEER1.PEER_residuals.txt   newlncRNA_exp.PEER1.PEER_residuals.INT.txt
+sed -i -e '1,1 s/^/ID\t/'   newlncRNA_exp.PEER1.PEER_residuals.INT.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   newlncRNA_exp.GeneLncRNA.hg19.bed  newlncRNA_exp.PEER1.PEER_residuals.INT.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz  
+zcat newlncRNA_exp.INT.sort1.bed.gz | perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/get_file_for_FUSION_format.pl -  > newlncRNA_exp.eQTL.FUSION.txt 
+
+
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe  newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_cisQTL.py  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe    newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp
+python /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_cis_ind_QTL.py  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe       newlncRNA_exp.INT.sort1.bed.gz   covar3_transpose.txt  cis_ind  all.cis_qtl.txt 
+
+
+
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH --ntasks-per-node=1
+#SBATCH --qos=huge
+#SBATCH --mem=20G
+#SBATCH -o GTEX-TML8-0005-SM-32QPA.R1.out
+#SBATCH -p intel-sc3,amd-ep2
+source ~/.bashrc 
+conda activate  /storage/yangjianLab/chenli/softwares/condalocal/python38  
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_cisQTL.py  /storage/yangjianLab/chenli/seq/PsychENCODE/BrainGVEx/eQTL/BrainGVEx_Unrelated_EUR_maf_mind_geno_hwe     newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp
+
+
+library(qvalue)
+setwd("/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1")
+D<-data.frame()
+for (x in 1:22) {
+  filename<-paste("newlncRNA_exp.map_cis.",x,".txt",sep="")
+  data2 = read.table(filename,header=T, stringsAsFactors=FALSE)
+  D<-rbind(D,data2)
+}
+
+
+Q <- qvalue(D$pval_beta)
+cat("  * Proportion of significant phenotypes =" , round((1 - Q$pi0) * 100, 2), "%\n")
+D<-data.frame(D,qval=Q$qvalues)
+write.table(D, "all.cis_qtl.txt", quote=FALSE, sep="\t",row.names=FALSE, col.names=T)
+
+
+
+
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/lncRNA.list.txt /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt
+grep "Brain"  newlncRNA_exp.GeneLncRNA.hg19.bed  |  cut -f4,4  > new.id.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 
+grep "ENSG"  newlncRNA_exp.GeneLncRNA.hg19.bed  |  cut -f4,4  > new.id1.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id1.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/lncRNA.list.txt /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt  1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id1.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt  1
+
+######merge (HBCC), New, 60 PEER, COUNT
+/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/filter_low_expressed_genes3.pl /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/newlncRNA_STARRSEMexp/gencode.v37lift37.genes.collapsed.lncRNA.TPM.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/newlncRNA_STARRSEMexp/gencode.v37lift37.genes.collapsed.lncRNA.fragments.txt  0.1  0.2  6  0.2  2 > newlncRNA_exp.eQTL.txt
+
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/TMM.R newlncRNA_exp.eQTL.txt  newlncRNA_exp.TMM.txt 
+
+perl   /storage/yangjianLab/chenli/scripts/lncRNApipe/gtf2bed.pl /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/gencode.v37lift37.genes.collapsed.PsychENCODElncRNA.gtf    gene  >  newlncRNA_exp.GeneLncRNA.hg19.bed 
+sed -i -e 's/^chr//'   newlncRNA_exp.GeneLncRNA.hg19.bed 
+
+cut -f1,1 HBCC_129samples_cov.txt | sed  -e '1,1d'  > HBCC.129samples.txt
+cut -f1,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.1.txt
+cut -f2,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.2.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl newlncRNA_exp.TMM.txt  HBCC.129samples.txt   > newlncRNA_exp.exp2.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  newlncRNA_exp.exp2.txt  > newlncRNA_exp.eQTL.title2.txt 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt 
+##cp newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt  
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   newlncRNA_exp.GeneLncRNA.hg19.bed   newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/run_PEER.R   newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp.PEER1  15 
+
+####Run R code below: Rscript generate_covar_BrainGVEx.R
+selected_sample<-readLines("HBCC.129samples.2.txt")
+cov_file<-"HBCC_129samples_cov.txt"
+cov_data=read.table(cov_file,head=T,stringsAsFactors=F,sep="\t")
+index=match(cov_data$individualID,selected_sample,nomatch=0)
+covs=cov_data[which(index!=0),-c(1,2,3,4,13)]
+ID=cov_data[which(index!=0),2]
+rownames(covs)=ID
+covs$ID<-ID
+
+index=which(covs$ageDeath=="90+")
+covs$ageDeath[index]=90
+covs$ageDeath=as.numeric(covs$ageDeath)
+index=which(is.na(covs$PMI))
+if(length(index)>0){
+	covs$PMI[index]=mean(covs$PMI[-index])
+}
+sex <- model.matrix(~as.factor(covs$sex))[,-1]
+diagnosis <- model.matrix(~as.factor(covs$diagnosis))[,-1]
+WGS_platform <- model.matrix(~as.factor(covs$WGS_platform))[,-1]
+cov_data2=data.frame(covs[,c("ID","PMI","RIN","pH","ageDeath")],WGS_platform,sex,diagnosis)
+cov_data2[c("CMC_HBCC_432"),]
+
+PCs<-read.table("HBCC_EUR.eigenvec",sep=" ",header=F)
+PCs<-PCs[,2:ncol(PCs)]
+colnames(PCs)<-c("ID",paste("PC",seq(1,20),sep=""))
+row.names(PCs)<-PCs$ID
+PCs[c("CMC_HBCC_432"),]
+
+dat_cov1<-merge(PCs,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+write.table(file="covar3_transpose.PEER.txt",dat_cov1,col.names = TRUE, row.names = TRUE, quote = FALSE,sep="\t")
+dat_cov1[c("CMC_HBCC_432"),]
+
+
+PEER<-read.table("newlncRNA_exp.PEER1.PEER_covariates.txt",sep="\t",stringsAsFactors=F,header=T)
+row.names(PEER)<-PEER$ID
+PEER<-PEER[,-1]
+PEER<-t(PEER)
+PEER<-data.frame(ID=row.names(PEER),PEER)
+PEER[c("CMC_HBCC_432"),]
+
+dat_cov<-merge(merge(PCs,PEER,by="ID"),cov_data2,by="ID")
+row.names(dat_cov)<-dat_cov$ID
+dat_cov[c("CMC_HBCC_432"),]
+dat_cov<-dat_cov[,-1]
+dat_cov<-dat_cov[selected_sample,]
+dat_cov<-t(dat_cov)
+dat_cov<-data.frame(ID=row.names(dat_cov),dat_cov)
+write.table(file="covar3_transpose.txt",dat_cov,col.names = TRUE, row.names = FALSE, quote = FALSE,sep="\t")
+dat_cov[,c("CMC_HBCC_432")]
+
+
+dat_cov1<-merge(PEER,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+dat_cov1<-t(dat_cov1)
+dat_cov1<-data.frame(ID=row.names(dat_cov1),dat_cov1)
+write.table(file="covar3_transpose.NoPCs.txt",dat_cov1,col.names = TRUE, row.names = FALSE, quote = FALSE,sep="\t")
+dat_cov1[,c("CMC_HBCC_432")]
+
+
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_withcovar.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe  newlncRNA_exp.INT.sort1.bed.gz  covar3_transpose.txt newlncRNA_exp
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/lncRNA.list.txt /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt
+grep "Brain"  newlncRNA_exp.GeneLncRNA.hg19.bed  |  cut -f4,4  > new.id.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 
+grep "ENSG"  newlncRNA_exp.GeneLncRNA.hg19.bed  |  cut -f4,4  > new.id1.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id1.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/lncRNA.list.txt /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt  1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id1.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt  1
+
+
+
+######lncRNAKB HBCC, 60 PEER, COUNT, RESIUALs
+/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1_lncRNAKB
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/filter_low_expressed_genes3.pl /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/lncRNAKB_exp_STARRSEM/gencode.v37lift37.genes.collapsed.lncRNA.TPM.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/lncRNAKB_exp_STARRSEM/gencode.v37lift37.genes.collapsed.lncRNA.fragments.txt  0.1  0.2  6  0.2  2 > newlncRNA_exp.eQTL.txt
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/TMM.R newlncRNA_exp.eQTL.txt  newlncRNA_exp.TMM.txt 
+
+perl   /storage/yangjianLab/chenli/scripts/lncRNApipe/gtf2bed.pl /storage/yangjianLab/chenli/genome/GRCh38/hg19_ref/lncRNAKB_hg38_v7.collapse.hg19.gtf     gene  >  newlncRNA_exp.GeneLncRNA.hg19.bed 
+sed -i -e 's/^chr//'   newlncRNA_exp.GeneLncRNA.hg19.bed 
+
+cut -f1,1 HBCC_129samples_cov.txt | sed  -e '1,1d'  > HBCC.129samples.txt
+cut -f1,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.1.txt
+cut -f2,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.2.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl newlncRNA_exp.TMM.txt  HBCC.129samples.txt   > newlncRNA_exp.exp2.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  newlncRNA_exp.exp2.txt  > newlncRNA_exp.eQTL.title2.txt 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt 
+##cp newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt  
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   newlncRNA_exp.GeneLncRNA.hg19.bed   newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+####Run R code below: Rscript generate_covar_BrainGVEx.R
+selected_sample<-readLines("HBCC.129samples.2.txt")
+cov_file<-"HBCC_cov.txt"
+cov_data = read.table(cov_file,head=T,stringsAsFactors=F,sep="\t");
+index=match(cov_data$individualID,selected_sample,nomatch=0)
+covs=cov_data[which(index!=0),-c(1,2,3,4)]
+ID=cov_data[which(index!=0),2]
+rownames(covs)=ID
+covs$ID<-ID
+index=which(covs$ageDeath=="90+")
+covs$ageDeath[index]=90
+covs$ageDeath=as.numeric(covs$ageDeath)
+index=which(is.na(covs$pH))
+covs$pH[index]=mean(covs$pH[-index])
+sex <- model.matrix(~as.factor(covs$sex))[,-1]
+diagnosis <- model.matrix(~as.factor(covs$diagnosis))[,-1]
+cov_data2=data.frame(covs[,c("ID","PMI","pH","RIN","ageDeath")],diagnosis,sex)
+cov_data2[c("CMC_HBCC_432"),]
+
+
+PCs<-read.table("HBCC_EUR.eigenvec",sep=" ",header=F)
+PCs<-PCs[,2:ncol(PCs)]
+colnames(PCs)<-c("ID",paste("PC",seq(1,20),sep=""))
+row.names(PCs)<-PCs$ID
+PCs[c("CMC_HBCC_432"),]
+
+dat_cov1<-merge(PCs,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+write.table(file="covar3_transpose.PEER.txt",dat_cov1,col.names = TRUE, row.names = TRUE, quote = FALSE,sep="\t")
+dat_cov1[c("CMC_HBCC_432"),]
+
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/run_PEER.R --max_iter 2000 --covariates covar3_transpose.PEER.txt  newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp.PEER1  30 
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   newlncRNA_exp.GeneLncRNA.hg19.bed  newlncRNA_exp.PEER1.PEER_residuals.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp 
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/lncRNA.list.txt /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt
+grep "Brain"  newlncRNA_exp.GeneLncRNA.hg19.bed  |  cut -f4,4  > new.id.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 
+grep "ENSG"  newlncRNA_exp.GeneLncRNA.hg19.bed  |  cut -f4,4  > new.id1.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id1.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 
+
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/lncRNA.list.txt /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt 1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt  1
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt  new.id1.txt   /storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/newlncRNA_exp_STARRSEM/PCGs.lists.txt  1
+
+######lncRNAKB HBCC, 60 PEER, COUNT
+/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL_lncRNAKB
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/filter_low_expressed_genes3.pl /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/lncRNAKB_exp_STARRSEM/gencode.v37lift37.genes.collapsed.lncRNA.TPM.txt  /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/lncRNAKB_exp_STARRSEM/gencode.v37lift37.genes.collapsed.lncRNA.fragments.txt  0.1  0.2  6  0.2  2 > newlncRNA_exp.eQTL.txt
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/TMM.R newlncRNA_exp.eQTL.txt  newlncRNA_exp.TMM.txt 
+
+perl   /storage/yangjianLab/chenli/scripts/lncRNApipe/gtf2bed.pl /storage/yangjianLab/chenli/genome/GRCh38/hg19_ref/lncRNAKB_hg38_v7.collapse.hg19.gtf     gene  >  newlncRNA_exp.GeneLncRNA.hg19.bed 
+sed -i -e 's/^chr//'   newlncRNA_exp.GeneLncRNA.hg19.bed 
+
+cut -f1,1 HBCC_129samples_cov.txt | sed  -e '1,1d'  > HBCC.129samples.txt
+cut -f1,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.1.txt
+cut -f2,2 HBCC_129samples_cov.txt  | sed  -e '1,1d'  > HBCC.129samples.2.txt
+perl /storage/yangjianLab/chenli/seq/LCLKG/eQTL/get_subsamples_exp_CMC.pl newlncRNA_exp.TMM.txt  HBCC.129samples.txt   > newlncRNA_exp.exp2.txt 
+perl  /storage/yangjianLab/chenli/seq/LCLKG/eQTL/replace.title2.pl HBCC.129samples.1.txt  newlncRNA_exp.exp2.txt  > newlncRNA_exp.eQTL.title2.txt 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/INT.R newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt 
+##cp newlncRNA_exp.eQTL.title2.txt  newlncRNA_exp.INT.txt  
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/expMatrix2phenotype.pl   newlncRNA_exp.GeneLncRNA.hg19.bed   newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.bed 
+sort -k1,1  -k2,2n newlncRNA_exp.INT.bed > newlncRNA_exp.INT.sort.bed 
+perl  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/replace.title1.pl  newlncRNA_exp.INT.sort.bed newlncRNA_exp.INT.txt  > newlncRNA_exp.INT.sort1.bed 
+bgzip -f newlncRNA_exp.INT.sort1.bed && tabix -f -p bed newlncRNA_exp.INT.sort1.bed.gz 
+
+Rscript /storage/yangjianLab/chenli/scripts/eQTLs_scripts/run_PEER.R   newlncRNA_exp.INT.sort1.bed.gz  newlncRNA_exp.PEER1  15 
+
+####Run R code below: Rscript generate_covar_BrainGVEx.R
+selected_sample<-readLines("HBCC.129samples.2.txt")
+cov_file<-"HBCC_129samples_cov.txt"
+cov_data=read.table(cov_file,head=T,stringsAsFactors=F,sep="\t")
+index=match(cov_data$individualID,selected_sample,nomatch=0)
+covs=cov_data[which(index!=0),-c(1,2,3,4,13)]
+ID=cov_data[which(index!=0),2]
+rownames(covs)=ID
+covs$ID<-ID
+
+index=which(covs$ageDeath=="90+")
+covs$ageDeath[index]=90
+covs$ageDeath=as.numeric(covs$ageDeath)
+index=which(is.na(covs$PMI))
+if(length(index)>0){
+	covs$PMI[index]=mean(covs$PMI[-index])
+}
+sex <- model.matrix(~as.factor(covs$sex))[,-1]
+diagnosis <- model.matrix(~as.factor(covs$diagnosis))[,-1]
+WGS_platform <- model.matrix(~as.factor(covs$WGS_platform))[,-1]
+cov_data2=data.frame(covs[,c("ID","PMI","RIN","pH","ageDeath")],WGS_platform,sex,diagnosis)
+cov_data2[c("CMC_HBCC_432"),]
+
+PCs<-read.table("HBCC_EUR.eigenvec",sep=" ",header=F)
+PCs<-PCs[,2:ncol(PCs)]
+colnames(PCs)<-c("ID",paste("PC",seq(1,20),sep=""))
+row.names(PCs)<-PCs$ID
+PCs[c("CMC_HBCC_432"),]
+
+dat_cov1<-merge(PCs,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+write.table(file="covar3_transpose.PEER.txt",dat_cov1,col.names = TRUE, row.names = TRUE, quote = FALSE,sep="\t")
+dat_cov1[c("CMC_HBCC_432"),]
+
+
+PEER<-read.table("newlncRNA_exp.PEER1.PEER_covariates.txt",sep="\t",stringsAsFactors=F,header=T)
+row.names(PEER)<-PEER$ID
+PEER<-PEER[,-1]
+PEER<-t(PEER)
+PEER<-data.frame(ID=row.names(PEER),PEER)
+PEER[c("CMC_HBCC_432"),]
+
+dat_cov<-merge(merge(PCs,PEER,by="ID"),cov_data2,by="ID")
+row.names(dat_cov)<-dat_cov$ID
+dat_cov[c("CMC_HBCC_432"),]
+dat_cov<-dat_cov[,-1]
+dat_cov<-dat_cov[selected_sample,]
+dat_cov<-t(dat_cov)
+dat_cov<-data.frame(ID=row.names(dat_cov),dat_cov)
+write.table(file="covar3_transpose.txt",dat_cov,col.names = TRUE, row.names = FALSE, quote = FALSE,sep="\t")
+dat_cov[,c("CMC_HBCC_432")]
+
+
+dat_cov1<-merge(PEER,cov_data2,by="ID")
+row.names(dat_cov1)<-dat_cov1$ID
+dat_cov1[c("CMC_HBCC_432"),]
+dat_cov1<-dat_cov1[,-1]
+dat_cov1<-dat_cov1[selected_sample,]
+dat_cov1<-t(dat_cov1)
+dat_cov1<-data.frame(ID=row.names(dat_cov1),dat_cov1)
+write.table(file="covar3_transpose.NoPCs.txt",dat_cov1,col.names = TRUE, row.names = FALSE, quote = FALSE,sep="\t")
+dat_cov1[,c("CMC_HBCC_432")]
+
+python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_withcovar.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe  newlncRNA_exp.INT.sort1.bed.gz  covar3_transpose.txt newlncRNA_exp
+##qsubshcom "python  /storage/yangjianLab/chenli/scripts/eQTLs_scripts/tensorQTL_CMC_withcovar.py /storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL/HBCC_EUR_maf_mind_geno_hwe  newlncRNA_exp.INT.sort1.bed.gz  covar3_transpose.txt newlncRNA_exp" 1 30G tensorQTL 300:00:00 "-queue=intel-e5,amd-ep2"
+
+
+find $(pwd) -name "newlncRNA_exp.cis_qtl_pairs.*.parquet.txt" > filelist.txt 
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/scripts/eQTLs_scripts/lncRNAKB.lncRNAlist.txt /storage/yangjianLab/chenli/scripts/eQTLs_scripts/lncRNAKB.PCGlist.txt
+perl /storage/yangjianLab/chenli/scripts/eQTLs_scripts/batch_count_overlap_PCG_lncRNA2.pl filelist.txt   /storage/yangjianLab/chenli/scripts/eQTLs_scripts/lncRNAKB.lncRNAlist.txt /storage/yangjianLab/chenli/scripts/eQTLs_scripts/lncRNAKB.PCGlist.txt 1
