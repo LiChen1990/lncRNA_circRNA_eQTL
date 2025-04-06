@@ -1,0 +1,2512 @@
+
+
+#### Figure 2
+
+### Figure2a
+dat <- read.table(header=TRUE, text='
+cohort	Annotation	SNum	eNum	Genetype
+CMC	lncRNAs_o_GENCODE	469	3699	lncRNAs_o_GENCODE
+ROSMAP	lncRNAs_o_GENCODE	832	5812	lncRNAs_o_GENCODE
+BrainGVEx	lncRNAs_o_GENCODE	384	3339	lncRNAs_o_GENCODE
+Mayo	lncRNAs_o_GENCODE	288	3934	lncRNAs_o_GENCODE
+LIBD	lncRNAs_o_GENCODE	128	1241	lncRNAs_o_GENCODE
+HBCC	lncRNAs_o_GENCODE	129	1615	lncRNAs_o_GENCODE
+MSBB_BM10	lncRNAs_o_GENCODE	183	855	lncRNAs_o_GENCODE
+MSBB_BM22	lncRNAs_o_GENCODE	158	1380	lncRNAs_o_GENCODE
+MSBB_BM36	lncRNAs_o_GENCODE	138	1199	lncRNAs_o_GENCODE
+MSBB_BM44	lncRNAs_o_GENCODE	156	798	lncRNAs_o_GENCODE
+CMC	lncRNAs_u	496	2355	lncRNAs_u
+ROSMAP	lncRNAs_u	832	4805	lncRNAs_u
+BrainGVEx	lncRNAs_u	384	2282	lncRNAs_u
+Mayo	lncRNAs_u	288	2507	lncRNAs_u
+LIBD	lncRNAs_u	128	718	lncRNAs_u
+HBCC	lncRNAs_u	129	805	lncRNAs_u
+MSBB_BM10	lncRNAs_u	183	448	lncRNAs_u
+MSBB_BM22	lncRNAs_u	167	870	lncRNAs_u
+MSBB_BM36	lncRNAs_u	148	703	lncRNAs_u
+MSBB_BM44	lncRNAs_u	156	353	lncRNAs_u
+CMC	PCG	496	5204	PCG
+ROSMAP	PCG	832	7647	PCG
+BrainGVEx	PCG	384	4202	PCG
+Mayo	PCG	288	4758	PCG
+LIBD	PCG	128	1155	PCG
+HBCC	PCG	129	1802	PCG
+MSBB_BM10	PCG	183	567	PCG
+MSBB_BM22	PCG	167	1663	PCG
+MSBB_BM36	PCG	148	1257	PCG
+MSBB_BM44	PCG	156	552	PCG
+')
+
+dat$cohort<-factor(dat$cohort,levels=c("CMC","ROSMAP","BrainGVEx","Mayo","LIBD","HBCC","MSBB_BM10","MSBB_BM22","MSBB_BM36","MSBB_BM44"))
+  
+group_colors <- c("red", "blue")
+p1 <- ggplot(dat, aes(x = SNum, y = eNum, shape=Genetype, color =cohort )) +
+  geom_point() +
+  ylab("# of eGenes") +
+  xlab("Sample size") +
+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_npg()+ scale_color_npg() 
+
+# Adjust the aspect ratio
+p1 <- p1 + coord_cartesian(ylim = c(0, 8000))
+p1
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure1.a1.pdf", p1,  width = 7, height = 5, units = "in", dpi = 300)
+
+
+
+### Figure2b
+data <- read.table(header=TRUE,sep="\t", text='
+cohort	type	num
+lncRNAs_o_GENCODE	tested eGenes	16670
+lncRNAs_u	tested eGenes	18429
+PCG	tested eGenes	16212
+circRNA	tested eGenes	23548
+lncRNAs_o_GENCODE	tested eGenes (p<=5e-8)	8357
+lncRNAs_u	tested eGenes (p<=5e-8)	7005
+PCG	tested eGenes (p<=5e-8)	10609
+circRNA	tested eGenes (p<=5e-8)	1312
+')
+
+data$type<-factor(data$type,levels=c("tested eGenes","tested eGenes (p<=5e-8)"))
+data$cohort<-factor(data$cohort,levels=c("lncRNAs_o_GENCODE","lncRNAs_u","PCG","circRNA"))
+
+
+
+p1<- ggplot(data, aes(fill=type, y=num, x=cohort, label = num)) +
+    geom_bar(position="dodge", stat="identity") + geom_text(aes(label = num), size = 3)+ylab("# of eGenes")+xlab("") +  theme_bw() +
+    theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(axis.text.x = element_text(angle=15, vjust=0.5)) + scale_fill_manual(values = c("#80ACF9","#B4DAA8"))  + theme(legend.position='top') 
+
+p1
+    
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure2.b.lncRNA.pdf", p1,  width = 6, height = 6, units = "in", dpi = 300)
+
+### Figure2c
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/enrichment")
+dat = read.table("torus_TF_RBP_results.txt", header=T, sep="\t", comment.char="") 
+
+library(ggplot2)
+library(ggpubr)
+p4<-ggplot(dat, aes(x = type1, y = val, fill = type)) +
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width = 0.07, position = position_dodge(width = 0.9))+
+  stat_compare_means(aes(label = ..p.signif..),method = "wilcox.test",hide.ns = F)+ylab("Enrichment (log-odds ratio)") + xlab("")+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#80ACF9","#B4DAA8")) + geom_hline(yintercept=0,linetype="dashed", color = "black")  + theme(legend.position="top")
+
+p4
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure1.d1e.pdf", p4,  width = 8, height = 6, units = "in", dpi = 300)
+
+### Figure2d
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/figs")
+
+data <- read.table(header=TRUE, text='
+name	type	Enrichment	sd
+splicesite.acc	PCG	2.703	0.446938776
+splicesite.don	PCG	3.32	0.324489796
+splicesite.acc	lncRNA	2.771	0.439285714
+splicesite.don	lncRNA	3.848	0.22755102
+splicesite.acc	circRNA	4.439	1.092346939
+splicesite.don	circRNA	5.265	0.491836735
+')
+
+data$type<-factor(data$type, levels = c("circRNA","lncRNA","PCG"))
+
+p6<-ggplot(data, aes(x=as.factor(name), y=Enrichment, fill=type)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=Enrichment-1.96*sd, ymax=Enrichment+1.96*sd), width=.2,position=position_dodge(.9))+xlab("")+ ylab("Enrichment (log-odds ratio)")+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + geom_hline(yintercept=0,linetype="dashed", color = "black")  + theme(legend.position="top")
+ 
+p6
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure1.g1.pdf", p6,  width = 8, height = 6, units = "in", dpi = 300)
+
+
+### Figure2e
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/leadSNP")
+
+lnc_beta<-read.table(file="lncRNA.lead.eQTL.txt",sep="\t",header=T)
+pcg_beta<-read.table(file="lncRNA.pcgs.lead.eQTL.txt",sep="\t",header=T)
+
+lnc_beta<-lnc_beta[which(abs(lnc_beta$b)<=2),]
+pcg_beta<-pcg_beta[which(abs(pcg_beta$b)<=2),]
+
+lnc_beta<-lnc_beta[which(lnc_beta$p<=5e-8),]
+pcg_beta<-pcg_beta[which(pcg_beta$p<=5e-8),]
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC/circ")
+
+circ_beta<-read.table(file="circRNA.eQTL.txt",sep="\t",header=F)
+circ_beta<-circ_beta[which(circ_beta$V14<=5e-8),]
+
+
+
+dat<-data.frame(var=lnc_beta$b)
+dat<-data.frame(type=c(rep("lncRNA",length(lnc_beta$b)),rep("PCG",length(pcg_beta$b)),rep("circRNA",length(circ_beta$V12))),beta=c(abs(lnc_beta$b),abs(pcg_beta$b),abs(circ_beta$V12)))
+library(ggpubr)
+dat$type<-factor(dat$type,levels=c("circRNA","lncRNA","PCG"))
+my_comparisons <- list( c("lncRNA", "PCG"),c("lncRNA", "circRNA"),c("circRNA", "PCG") )
+p3<-ggviolin(dat, x = "type", y = "beta", fill = "type",
+         add = "boxplot", add.params = list(fill = "white"))+
+  stat_compare_means(comparisons = my_comparisons, label = "p.signif") + xlab("")+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + theme(legend.position = 'top')
+p3
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure1.c1.circ.pdf", p3,  width = 8, height = 6, units = "in", dpi = 300)
+
+summary(abs(lnc_beta$b))
+summary(abs(pcg_beta$b))
+summary(abs(circ_beta$V12))
+
+
+###Figure2f
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/enrichment")
+df = read.table(file="lnc_pcg_tss_dis10k.txt",sep="\t",header=T)
+p7<-ggplot(df, aes(values, after_stat(count), fill = type)) +
+  geom_density(position = "stack")+xlim(-10^6, 10^6) +xlab("TSS")+ylab("Density") +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  )  + scale_fill_manual(values = c("#80ACF9","#B4DAA8"))   + theme(legend.position = c(0.9, 0.8))
+
+p7
+
+
+### Figure 3
+
+###Figure3a
+
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	Tau	Tau_SE	Prop	Prop_SE	enrichment	enrichment_SE
+AAM	lncRNA	2.386457631	0.398107879	7.48E-07	2.29137E-07	0.051855409	0.012848644	29.57090731	7.540714372
+AD	lncRNA	1.91144	0.485934534	3.70E-08	6.18291E-08	0.036878068	0.028840306	23.12909739	17.03379398
+ALS	lncRNA	2.534595775	0.651423058	1.12E-06	3.31823E-07	0.209223496	0.063036783	125.368855	37.42834154
+AN	lncRNA	2.165191548	0.756335125	6.57E-07	5.01564E-07	0.034705552	0.020800234	20.76922257	12.22144287
+BIP	lncRNA	2.687786099	0.343195349	1.47E-06	3.29271E-07	0.066277521	0.012565866	38.77875567	7.417613355
+CP	lncRNA	2.168135151	0.277886331	1.16E-06	1.91556E-07	0.074509882	0.010943662	43.24582889	6.385542672
+EA	lncRNA	2.433400383	0.299714756	6.20E-07	9.8947E-08	0.068053777	0.009724029	39.78801746	5.689468406
+Insomnia	lncRNA	3.068106082	0.429836066	2.31E-07	6.8175E-08	0.066586487	0.017125064	38.36866223	9.928534952
+IQ	lncRNA	2.094983106	0.294572368	1.10E-06	1.86713E-07	0.072918036	0.011244278	42.35041176	6.524254717
+MDD	lncRNA	2.822885089	0.374834657	4.34E-07	7.23245E-08	0.088563265	0.013791378	49.94963432	8.162195289
+neuroticism	lncRNA	2.260652378	0.334556404	5.29E-07	9.47401E-08	0.062875644	0.009837644	37.08526586	5.793889122
+PD	lncRNA	1.25635986	0.496262664	4.81E-08	5.03705E-08	0.050365541	0.035515021	28.36048677	21.04588825
+SCZ	lncRNA	2.662974359	0.341404986	4.05E-06	7.93651E-07	0.067996769	0.011763402	38.68369173	6.862338765
+SmkInt	lncRNA	1.859776237	0.302040715	2.02E-07	5.37408E-08	0.040729887	0.009116625	23.01209866	5.276894375
+AAM	PCG	3.389099396	0.513908032	1.85E-06	3.83105E-07	0.089678253	0.017159228	65.54294014	12.63065386
+AD	PCG	3.078580551	0.751223845	5.55E-07	1.37489E-07	0.211867709	0.04630098	156.1734158	34.03490481
+ALS	PCG	4.858137991	0.974187218	6.58E-07	3.54762E-07	0.108401161	0.051318031	81.17325707	37.60106431
+AN	PCG	2.775588927	0.842045304	1.68E-06	6.7858E-07	0.060639274	0.02235814	44.7322401	16.44618107
+BIP	PCG	3.924269008	0.41463446	2.99E-06	5.46595E-07	0.098320867	0.016657501	72.19026339	12.22938653
+CP	PCG	3.329836524	0.337990941	1.52E-06	2.26471E-07	0.076273907	0.010353685	55.86529018	7.624952157
+EA	PCG	3.768016236	0.379014743	7.19E-07	1.17553E-07	0.062474648	0.009339427	45.86703159	6.835187655
+Insomnia	PCG	4.866855334	0.618268211	3.95E-07	8.07761E-08	0.085088599	0.015982996	62.213375	11.80733148
+IQ	PCG	3.307273791	0.348040462	1.42E-06	2.30162E-07	0.074017783	0.011064412	54.22737073	8.124400634
+MDD	PCG	4.803749446	0.475699607	2.81E-07	7.79466E-08	0.049320702	0.01156904	35.41301863	8.481179779
+neuroticism	PCG	3.357411936	0.451022525	5.61E-07	1.35734E-07	0.053396258	0.011396947	39.34146695	8.3597257
+PD	PCG	2.176414044	0.702985741	3.39E-07	9.51977E-08	0.193544153	0.052799662	141.6126259	38.96161405
+SCZ	PCG	3.911139331	0.357527606	5.08E-06	9.03519E-07	0.066846506	0.010711239	48.66830197	7.881361112
+SmkInt	PCG	2.939839749	0.37847522	4.36E-07	7.00383E-08	0.062789328	0.00911326	45.75838717	6.669338467
+AAM	circRNA	0.581648775	0.5814717	1.26336E-06	7.14529E-07	0.006024006	0.004694195	30.90366526	24.0816209
+AD	circRNA	-0.701504739	0.799090346	-9.89363E-08	1.43052E-07	-0.008944096	0.007606337	-45.8839763	39.02115833
+ALS	circRNA	-2.354197258	2.35974092	-4.43833E-07	7.17227E-07	-0.017754251	0.014366303	-91.08082072	73.700359
+AN	circRNA	-0.546693198	1.638398004	-1.90398E-07	1.50497E-06	-0.002394173	0.007158478	-12.28231244	36.72360016
+BIP	circRNA	0.081154717	0.65534603	7.807E-07	8.28007E-07	0.000528958	0.003667793	2.713599823	18.81608969
+CP	circRNA	0.338303613	0.43657171	9.10614E-07	5.67305E-07	0.003014579	0.003745683	15.46504863	19.21567498
+EA	circRNA	0.078909439	0.429673732	2.73058E-07	2.21233E-07	0.000591024	0.002524116	3.032003152	12.94892764
+Insomnia	circRNA	0.733335387	0.940578947	2.54879E-07	2.14314E-07	0.004418508	0.006213739	22.66732235	31.87701286
+IQ	circRNA	0.275387454	0.427334773	8.13811E-07	5.18886E-07	0.002714696	0.003555637	13.92662193	18.24071987
+MDD	circRNA	2.510964544	0.832120465	7.4091E-07	2.36335E-07	0.013195711	0.005210149	67.69511986	26.72850728
+neuroticism	circRNA	-0.36532531	0.804851027	5.69065E-08	2.708E-07	-0.001736986	0.003352432	-8.910888237	17.19826151
+PD	circRNA	0.710766441	1.03274104	1.46467E-07	1.32938E-07	0.007846661	0.010808796	40.25403896	55.45004322
+SCZ	circRNA	0.943334966	0.403908807	6.40672E-06	2.02758E-06	0.00859743	0.003540977	44.10555004	18.16551205
+SmkInt	circRNA	1.393302417	0.751362207	4.09223E-07	2.03628E-07	0.006186585	0.003962673	31.73770991	20.3288487
+')
+
+
+#pi<-pi[pi$Type=="circRNA",]
+#pi$Type <- factor(pi$Type, levels = c("circRNA"))
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+
+median(pi[pi$Type %in% c("lncRNA"),]$Est)
+median(pi[pi$Type %in% c("PCG"),]$Est)
+mean(pi[pi$Type %in% c("lncRNA"),]$Est)
+mean(pi[pi$Type %in% c("PCG"),]$Est)
+
+
+p3= ggplot(pi, aes(Trait, Est,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=Est-1.96*SE, ymax=Est+1.96*SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("") + ylab("Fold enrichment") + ggtitle("") +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8")) + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$Est),linetype="dashed", color = "#E99C93")  + geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$Est),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$Est),linetype="dashed", color = "#B4DAA8") + geom_hline(yintercept=1,linetype="dashed", color = "black")   +coord_flip()  + theme(legend.position = c(0.2, 0.9))
+  
+p3
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure3.c1.Foldenrichment.pdf", p3,  width = 6, height = 6, units = "in", dpi = 300)
+
+
+###Figure3b
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE
+AAM	all	0.118538437	0.053312701
+AD	all	0.353615407	0.118213447
+ALS	all	0.528415076	0.130855101
+AN	all	0.018208218	0.110629755
+BIP	all	0.229989965	0.041502089
+CP	all	0.184600288	0.032967021
+EA	all	0.103323868	0.025931831
+Insomnia	all	0.163114715	0.052762805
+IQ	all	0.186886784	0.034026616
+MDD	all	0.133140523	0.04053452
+neuroticism	all	0.0636103	0.035253874
+PD	all	0.375419382	0.121132782
+SCZ	all	0.213292864	0.032998304
+SmkInt	all	0.094945403	0.032162028
+AAM	lncRNA	0.040768912	0.034594169
+AD	lncRNA	0.11903313	0.110897868
+ALS	lncRNA	0.321135684	0.132518895
+AN	lncRNA	-0.065177336	0.088596971
+BIP	lncRNA	0.127510892	0.03131111
+CP	lncRNA	0.115240743	0.027185321
+EA	lncRNA	0.064805168	0.02435824
+Insomnia	lncRNA	0.149613213	0.04349675
+IQ	lncRNA	0.112390965	0.026933065
+MDD	lncRNA	0.10001378	0.030402395
+neuroticism	lncRNA	0.070050205	0.030598195
+PD	lncRNA	0.205681259	0.086387766
+SCZ	lncRNA	0.141541453	0.027598395
+SmkInt	lncRNA	0.057675387	0.02728965
+AAM	PCG	0.200975493	0.0387473
+AD	PCG	0.331082363	0.088459875
+ALS	PCG	0.40768825	0.111363723
+AN	PCG	0.059391288	0.070411507
+BIP	PCG	0.198615341	0.039752066
+CP	PCG	0.147321652	0.033334153
+EA	PCG	0.09471127	0.022871397
+Insomnia	PCG	0.123559929	0.048638684
+IQ	PCG	0.143963402	0.032506438
+MDD	PCG	0.096151721	0.038039797
+neuroticism	PCG	0.045158572	0.034909535
+PD	PCG	0.335147186	0.114987178
+SCZ	PCG	0.156690697	0.034028236
+SmkInt	PCG	0.065619753	0.026240157
+AAM	circRNA	0.065379026	0.031318525
+AD	circRNA	-0.043996384	0.081486218
+ALS	circRNA	0.075214281	0.098246812
+AN	circRNA	0.037076658	0.065393346
+BIP	circRNA	0.038026306	0.033739379
+CP	circRNA	0.02503425	0.024508355
+EA	circRNA	0.002686751	0.015247611
+Insomnia	circRNA	-0.020986671	0.051146108
+IQ	circRNA	0.00912221	0.02208622
+MDD	circRNA	0.036985022	0.03605889
+neuroticism	circRNA	-0.038008888	0.023952466
+PD	circRNA	0.164934335	0.075298563
+SCZ	circRNA	0.058445296	0.02615029
+SmkInt	circRNA	0.037739937	0.025115493
+')
+
+
+pi<-pi[pi$Type %in% c("circRNA","lncRNA","PCG"),]
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+
+median(pi[pi$Type %in% c("lncRNA"),]$Est)
+median(pi[pi$Type %in% c("PCG"),]$Est)
+mean(pi[pi$Type %in% c("lncRNA"),]$Est)
+mean(pi[pi$Type %in% c("PCG"),]$Est)
+
+p1= ggplot(pi, aes(Trait, Est,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=Est-1.96*SE, ymax=Est+1.96*SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("") + ylab(bquote(paste(italic(h)[med]^{2},"/",paste(italic(h)[g]^{2},sep=" ")))) + ggtitle("") +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$Est),linetype="dashed", color = "#E99C93")+ geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$Est),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$Est),linetype="dashed", color = "#B4DAA8")  + coord_flip()   + theme(legend.position = c(0.9, 0.5))
+  
+p1
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure3.a1.pdf", p1,  width = 6, height = 6, units = "in", dpi = 300)
+
+
+
+###Figure3c
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+library(ComplexUpset)
+library(ggplot2)
+data<-read.table(file="5methods.txt",sep="\t",header=T); 
+data$SMR<-as.logical(data$SMR)
+data$COLOC<-as.logical(data$COLOC)
+data$TWAS<-as.logical(data$TWAS)
+data$OPERA_1x<-as.logical(data$OPERA_1x)
+data$OPERA_2x<-as.logical(data$OPERA_2x)
+listname<-c("SMR","COLOC","TWAS","OPERA_1x","OPERA_2x")
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+pdf(file = "FigureS4.b1.pdf",width=10,height=6)
+upset(
+    data,
+    listname,
+    base_annotations=list(
+        'Intersection size'=intersection_size(
+            counts=FALSE,
+            mapping=aes(fill=genetype)
+        )
+    ),
+    width_ratio=0.5
+)
+dev.off()
+
+
+###Figure3d
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/circRNA/figures")
+SMR<-readLines("SMR.circ.eGenes.txt")
+COLOC<-readLines("COLOC.circ.eGenes.txt")
+
+
+
+# Prepare a palette of 3 colors with R colorbrewer:
+library(RColorBrewer)
+library(VennDiagram)
+myCol <- brewer.pal(3, "Pastel2")[1:2]
+
+# Chart
+venn.plot = venn.diagram(
+        x = list(SMR, COLOC),
+        category.names = c("SMR" , "COLOC" ),
+        filename = NULL,
+        output=NULL,
+        
+        # Output features
+        imagetype="png" ,
+        height = 480 , 
+        width = 480 , 
+        resolution = 300,
+        compression = "lzw",
+        
+        # Circles
+        lwd = 2,
+        lty = 'blank',
+        fill = myCol,
+        
+        # Numbers
+        cex = .6,
+        fontface = "bold",
+        fontfamily = "sans"
+        
+)
+   
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")   
+pdf(file="Figure3.g1.circ.pdf")
+grid.draw(venn.plot)
+dev.off()
+
+
+
+###Figure3e
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/leadSNP")
+circRNA_eQTLs<-readLines("circRNA_eQTLs_GWAS_loci.txt")
+lncRNA_eQTLs<-readLines("lncRNA_eQTLs_GWAS_loci.txt")
+PCG_eQTLs<-readLines("PCG_eQTLs_GWAS_loci.txt")
+PCG_sQTLs<-readLines("sQTL_GWAS_loci.txt")
+
+
+library(ggVennDiagram)
+ 
+
+x <- list(A=circRNA_eQTLs,
+          B=lncRNA_eQTLs,
+          C=PCG_eQTLs,
+          D=PCG_sQTLs)
+          
+# method1
+library(ggplot2)
+p<-ggVennDiagram(x,label_percent_digit = 1,category.names = c("circRNA_eQTLs","lncRNA_eQTLs","PCG_eQTLs","PCG_sQTLs"),
+              label = "both", 
+              label_color = "black",
+              label_alpha = 0,
+              edge_lty = "solid", 
+              edge_size = 1) +
+ scale_fill_distiller(palette = "Pastel1")
+  
+
+p
+ 
+length(unique(c(circRNA_eQTLs,lncRNA_eQTLs,PCG_eQTLs,PCG_sQTLs)))
+length(unique(c(PCG_eQTLs,PCG_sQTLs)))
+length(unique(c(circRNA_eQTLs,lncRNA_eQTLs)))
+length(intersect(unique(c(PCG_eQTLs,PCG_sQTLs)),unique(c(circRNA_eQTLs,lncRNA_eQTLs))))
+
+###Figure3f 
+
+
+data <- read.table(header=TRUE, sep="\t",text='
+group1	group2	count
+lncRNA	1	576
+lncRNA	2	144
+lncRNA	3	49
+lncRNA	4	13
+lncRNA	5	6
+lncRNA	6	2
+lncRNA	7	2
+lncRNA	8	1
+lncRNA	9	2
+circRNA	1	6
+circRNA	2	2
+circRNA	3	0
+circRNA	4	0
+circRNA	5	0
+circRNA	6	0
+circRNA	7	0
+circRNA	8	0
+circRNA	9	0
+')
+
+
+data$group2<-as.factor(data$group2)
+p<-ggplot(data, aes(fill=group1, y=count, x=group2)) + 
+    geom_bar(position="dodge", stat="identity")+ geom_text(aes(label = count), size = 3) + xlab("# of shared traits")+ylab("# of lncRNAs/circRNAs")+
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16)
+  )  +theme(axis.text.x = element_text(angle = 0, vjust=1, hjust=1, colour="black"))   + scale_fill_manual(values = c("#80ACF9","#B4DAA8"))
+
+p
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure3.g2.pdf", p,  width = 7, height = 5, units = "in", dpi = 300)
+
+
+
+
+###Figure 4
+
+### Figure4a
+
+### Figure4b
+
+###Figure 5
+
+### Figure4a
+
+### Figure4b
+
+### Figure4c
+
+### Figure4d
+
+###Figure 6
+
+
+###Figure S1
+
+###Figure S1a
+data <- read.table(header=TRUE, sep="\t",text='
+ID	Type	Num
+Merge	1	26824
+Merge	2	4608
+Merge	3	1915
+Merge	4	1037
+Merge	5	715
+Merge	>5	3342
+CMC/rRNA-depleted/PE	1	22840
+CMC/rRNA-depleted/PE	2	1657
+CMC/rRNA-depleted/PE	3	663
+CMC/rRNA-depleted/PE	4	338
+CMC/rRNA-depleted/PE	5	258
+CMC/rRNA-depleted/PE	>5	951
+HBCC/rRNA-depleted/PE	1	2898
+HBCC/rRNA-depleted/PE	2	340
+HBCC/rRNA-depleted/PE	3	151
+HBCC/rRNA-depleted/PE	4	72
+HBCC/rRNA-depleted/PE	5	41
+HBCC/rRNA-depleted/PE	>5	154
+LIBD/polyAselection/PE	1	6308
+LIBD/polyAselection/PE	2	679
+LIBD/polyAselection/PE	3	282
+LIBD/polyAselection/PE	4	127
+LIBD/polyAselection/PE	5	79
+LIBD/polyAselection/PE	>5	200
+Mayo/polyAselection/PE	1	4305
+Mayo/polyAselection/PE	2	624
+Mayo/polyAselection/PE	3	252
+Mayo/polyAselection/PE	4	125
+Mayo/polyAselection/PE	5	69
+Mayo/polyAselection/PE	>5	174
+MSBB/rRNA-depleted/SE	1	32414
+MSBB/rRNA-depleted/SE	2	3423
+MSBB/rRNA-depleted/SE	3	1363
+MSBB/rRNA-depleted/SE	4	774
+MSBB/rRNA-depleted/SE	5	500
+MSBB/rRNA-depleted/SE	>5	2125
+ROSMAP/rRNA-depleted/PE	1	30171
+ROSMAP/rRNA-depleted/PE	2	2645
+ROSMAP/rRNA-depleted/PE	3	931
+ROSMAP/rRNA-depleted/PE	4	470
+ROSMAP/rRNA-depleted/PE	5	280
+ROSMAP/rRNA-depleted/PE	>5	881
+GENCODE	1	14577
+GENCODE	2	1847
+GENCODE	3	958
+GENCODE	4	622
+GENCODE	5	409
+GENCODE	>5	1552
+lncRNAKB	1	54395
+lncRNAKB	2	7481
+lncRNAKB	3	3537
+lncRNAKB	4	2122
+lncRNAKB	5	1477
+lncRNAKB	>5	7695
+BrainGVEx/rRNA-depleted/PE	1	8015
+BrainGVEx/rRNA-depleted/PE	2	1233
+BrainGVEx/rRNA-depleted/PE	3	520
+BrainGVEx/rRNA-depleted/PE	4	293
+BrainGVEx/rRNA-depleted/PE	5	197
+BrainGVEx/rRNA-depleted/PE	>5	692
+')
+
+data$ID <- factor(data$ID, levels = c("BrainGVEx/rRNA-depleted/PE", "CMC/rRNA-depleted/PE","HBCC/rRNA-depleted/PE","LIBD/polyAselection/PE","Mayo/polyAselection/PE","MSBB/rRNA-depleted/SE","ROSMAP/rRNA-depleted/PE","Merge","GENCODE","lncRNAKB"))
+p4<-ggplot(data, aes(fill=Type, y=Num, x=ID)) + 
+    geom_bar(position="fill", stat="identity")+theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) +xlab("") +ylab("Percentage of lncRNAs")  +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) +theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black"))  + scale_fill_npg()+ scale_color_npg() + theme(legend.position='top')
+
+p4
+
+###Figure S1b
+
+
+data <- read.table(header=TRUE, sep="\t",text='
+ID	Type	Num
+BrainGVEx	covered by lncRNAKB	0.632054795
+CMC	covered by lncRNAKB	0.639719924
+HBCC	covered by lncRNAKB	0.724015317
+LIBD	covered by lncRNAKB	0.720781759
+Mayo	covered by lncRNAKB	0.726256983
+MSBB	covered by lncRNAKB	0.640927116
+ROSMAP	covered by lncRNAKB	0.640680649
+Merge	covered by lncRNAKB	0.64930673
+BrainGVEx	covered by GENCODE	0.293789954
+CMC	covered by GENCODE	0.323585577
+HBCC	covered by GENCODE	0.473194748
+LIBD	covered by GENCODE	0.414201954
+Mayo	covered by GENCODE	0.440439719
+MSBB	covered by GENCODE	0.267888372
+ROSMAP	covered by GENCODE	0.275821132
+Merge	covered by GENCODE	0.285840639
+')
+
+data$ID <- factor(data$ID, levels = c("BrainGVEx", "CMC","HBCC","LIBD","Mayo","MSBB","ROSMAP","Merge"))
+p2<-ggplot(data=data, aes(x=ID, y=Num, fill=Type)) +
+geom_bar(stat="identity", position=position_dodge())+theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) +xlab("") +ylab("Percentage of lncRNAs")  +  theme_bw() +
+  theme(
+     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) +theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) + scale_fill_npg()+ scale_color_npg() + theme(legend.position='top')
+
+p2
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.b1.pdf", p2,  width=8,height=6, units = "in", dpi = 300)  
+
+###Figure S1c
+
+### exon number
+data <- read.table(header=TRUE, sep="\t",text="
+ID	Type	Num
+Merge	1	4860
+Merge	2	64904
+Merge	3	20289
+Merge	4	9206
+Merge	5	5119
+Merge	>5	12707
+CMC/rRNA-depleted/PE	1	15450
+CMC/rRNA-depleted/PE	2	16885
+CMC/rRNA-depleted/PE	3	4343
+CMC/rRNA-depleted/PE	4	2145
+CMC/rRNA-depleted/PE	5	1362
+CMC/rRNA-depleted/PE	>5	4760
+HBCC/rRNA-depleted/PE	1	1249
+HBCC/rRNA-depleted/PE	2	2417
+HBCC/rRNA-depleted/PE	3	959
+HBCC/rRNA-depleted/PE	4	534
+HBCC/rRNA-depleted/PE	5	414
+HBCC/rRNA-depleted/PE	>5	1151
+LIBD/polyAselection/PE	1	3294
+LIBD/polyAselection/PE	2	4339
+LIBD/polyAselection/PE	3	1561
+LIBD/polyAselection/PE	4	934
+LIBD/polyAselection/PE	5	536
+LIBD/polyAselection/PE	>5	884
+Mayo/polyAselection/PE	1	1694
+Mayo/polyAselection/PE	2	4193
+Mayo/polyAselection/PE	3	1434
+Mayo/polyAselection/PE	4	723
+Mayo/polyAselection/PE	5	370
+Mayo/polyAselection/PE	>5	657
+MSBB/rRNA-depleted/SE	1	14791
+MSBB/rRNA-depleted/SE	2	42624
+MSBB/rRNA-depleted/SE	3	11526
+MSBB/rRNA-depleted/SE	4	5207
+MSBB/rRNA-depleted/SE	5	2926
+MSBB/rRNA-depleted/SE	>5	6846
+ROSMAP/rRNA-depleted/PE	1	18884
+ROSMAP/rRNA-depleted/PE	2	22834
+ROSMAP/rRNA-depleted/PE	3	5112
+ROSMAP/rRNA-depleted/PE	4	2118
+ROSMAP/rRNA-depleted/PE	5	1171
+ROSMAP/rRNA-depleted/PE	>5	1886
+GENCODE	1	6010
+GENCODE	2	13166
+GENCODE	3	10800
+GENCODE	4	8051
+GENCODE	5	5291
+GENCODE	>5	7312
+lncRNAKB	1	61116
+lncRNAKB	2	57536
+lncRNAKB	3	40030
+lncRNAKB	4	21059
+lncRNAKB	5	10825
+lncRNAKB	>5	16733
+BrainGVEx/rRNA-depleted/PE	1	2876
+BrainGVEx/rRNA-depleted/PE	2	14366
+BrainGVEx/rRNA-depleted/PE	3	3448
+BrainGVEx/rRNA-depleted/PE	4	1298
+BrainGVEx/rRNA-depleted/PE	5	584
+BrainGVEx/rRNA-depleted/PE	>5	993
+")
+
+data$ID <- factor(data$ID, levels = c("BrainGVEx/rRNA-depleted/PE", "CMC/rRNA-depleted/PE","HBCC/rRNA-depleted/PE","LIBD/polyAselection/PE","Mayo/polyAselection/PE","MSBB/rRNA-depleted/SE","ROSMAP/rRNA-depleted/PE","Merge","GENCODE","lncRNAKB"))
+p3<-ggplot(data, aes(fill=Type, y=Num, x=ID)) + 
+    geom_bar(position="fill", stat="identity")+theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) +xlab("") +ylab("Percentage of lncRNAs") +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) +theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) + scale_fill_npg()+ scale_color_npg()  + theme(legend.position='top')
+
+p3
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.c1.pdf", p3,  width=8,height=6, units = "in", dpi = 300)  
+
+
+###Figure S1d
+
+
+### Isoform Number
+data <- read.table(header=TRUE, sep="\t",text='
+ID	Type	Num
+Merge	1	26824
+Merge	2	4608
+Merge	3	1915
+Merge	4	1037
+Merge	5	715
+Merge	>5	3342
+CMC/rRNA-depleted/PE	1	22840
+CMC/rRNA-depleted/PE	2	1657
+CMC/rRNA-depleted/PE	3	663
+CMC/rRNA-depleted/PE	4	338
+CMC/rRNA-depleted/PE	5	258
+CMC/rRNA-depleted/PE	>5	951
+HBCC/rRNA-depleted/PE	1	2898
+HBCC/rRNA-depleted/PE	2	340
+HBCC/rRNA-depleted/PE	3	151
+HBCC/rRNA-depleted/PE	4	72
+HBCC/rRNA-depleted/PE	5	41
+HBCC/rRNA-depleted/PE	>5	154
+LIBD/polyAselection/PE	1	6308
+LIBD/polyAselection/PE	2	679
+LIBD/polyAselection/PE	3	282
+LIBD/polyAselection/PE	4	127
+LIBD/polyAselection/PE	5	79
+LIBD/polyAselection/PE	>5	200
+Mayo/polyAselection/PE	1	4305
+Mayo/polyAselection/PE	2	624
+Mayo/polyAselection/PE	3	252
+Mayo/polyAselection/PE	4	125
+Mayo/polyAselection/PE	5	69
+Mayo/polyAselection/PE	>5	174
+MSBB/rRNA-depleted/SE	1	32414
+MSBB/rRNA-depleted/SE	2	3423
+MSBB/rRNA-depleted/SE	3	1363
+MSBB/rRNA-depleted/SE	4	774
+MSBB/rRNA-depleted/SE	5	500
+MSBB/rRNA-depleted/SE	>5	2125
+ROSMAP/rRNA-depleted/PE	1	30171
+ROSMAP/rRNA-depleted/PE	2	2645
+ROSMAP/rRNA-depleted/PE	3	931
+ROSMAP/rRNA-depleted/PE	4	470
+ROSMAP/rRNA-depleted/PE	5	280
+ROSMAP/rRNA-depleted/PE	>5	881
+GENCODE	1	14577
+GENCODE	2	1847
+GENCODE	3	958
+GENCODE	4	622
+GENCODE	5	409
+GENCODE	>5	1552
+lncRNAKB	1	54395
+lncRNAKB	2	7481
+lncRNAKB	3	3537
+lncRNAKB	4	2122
+lncRNAKB	5	1477
+lncRNAKB	>5	7695
+BrainGVEx/rRNA-depleted/PE	1	8015
+BrainGVEx/rRNA-depleted/PE	2	1233
+BrainGVEx/rRNA-depleted/PE	3	520
+BrainGVEx/rRNA-depleted/PE	4	293
+BrainGVEx/rRNA-depleted/PE	5	197
+BrainGVEx/rRNA-depleted/PE	>5	692
+')
+
+data$ID <- factor(data$ID, levels = c("BrainGVEx/rRNA-depleted/PE", "CMC/rRNA-depleted/PE","HBCC/rRNA-depleted/PE","LIBD/polyAselection/PE","Mayo/polyAselection/PE","MSBB/rRNA-depleted/SE","ROSMAP/rRNA-depleted/PE","Merge","GENCODE","lncRNAKB"))
+p4<-ggplot(data, aes(fill=Type, y=Num, x=ID)) + 
+    geom_bar(position="fill", stat="identity")+theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) +xlab("") +ylab("Percentage of lncRNAs")  +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) +theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black"))  + scale_fill_npg()+ scale_color_npg() + theme(legend.position='top')
+
+p4
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.d1.pdf", p4,  width=8,height=6, units = "in", dpi = 300)    
+
+
+
+###Figure S1e
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/exp")
+dat<-read.table(file="mean_dis_3datasets_CMC.txt",sep="\t",header=T);
+dat$value<-log(dat$value+1)
+p5<-ggplot(dat, aes(x = type, y = value,fill=type)) +scale_y_continuous(name = "log(TPM+1)",limits=c(0, 3))+
+        geom_boxplot() + xlab("")  +  theme_bw() +
+  theme(
+      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')  + scale_fill_npg()+ scale_color_npg() 
+        
+
+p5
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.e1.pdf", p5,  width=8,height=6, units = "in", dpi = 300)   
+
+
+###Figure S1f
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/exp")
+dat<-read.table(file="mean_dis_lnc.pcg_CMC.txt",sep="\t",header=T);
+dat$value<-log(dat$value+1)
+p6<-ggplot(dat, aes(x = type, y = value,fill=type)) +scale_y_continuous(name = "log(TPM+1)",limits=c(0, 3))+
+        geom_boxplot() + xlab("")     +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')  + scale_fill_npg()+ scale_color_npg()  
+  
+p6
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.f1.pdf", p6,  width=8,height=6, units = "in", dpi = 300)  
+
+
+###Figure S1g
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/exp")
+dat<-read.table(file="spec_dis_lnc.pcg_CMC.txt",sep="\t",header=T);
+dat$value<-log(dat$value+1)
+p7<-ggplot(dat, aes(x = type, y = value,fill=type)) +scale_y_continuous(name = "Shannon entropy",limits=c(1.75, 2.10))+
+        geom_boxplot() + xlab("")   +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')  + scale_fill_npg()+ scale_color_npg()  
+  
+p7
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.g1.pdf", p7,  width=8,height=6, units = "in", dpi = 300)  
+
+
+###Figure S2
+
+###Figure S2a
+library(UpSetR)
+library(ggplotify)
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/WGCNA")
+movies <- read.table("overlapping_lncRNAs_10corhort1_exped.txt", header = T, sep = "\t") 
+##BrainGVEx CMC HBCC LIBD MSBB_BM10 MSBB_BM22 MSBB_BM36 MSBB_BM44 Mayo ROSMAP
+p1<-as.ggplot(upset(movies, sets = c("BrainGVEx", "CMC", "HBCC", "LIBD", "Mayo", "ROSMAP", "MSBB"), 
+    mainbar.y.label = "# of overlapped between cohorts", sets.x.label = "# of lncRNAs in each cohort", 
+order.by = "freq",number.angles = 20, point.size = 2.5, line.size = 1,text.scale = c(1.3, 1.3, 1, 1, 2, 1), keep.order = TRUE,sets.bar.color = "#56B4E9",queries = list(list(query = intersects, params = list("BrainGVEx", "CMC", "HBCC", "LIBD", "Mayo", "ROSMAP", "MSBB"), active = T))) )
+
+p1
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS2.a.pdf", p1,  width=8,height=6, units = "in", dpi = 300)  
+
+
+
+###Figure S2b
+
+library(UpSetR)
+library(ggplotify)
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/WGCNA")
+movies <- read.table("overlapping_lncRNAs_10corhort1.tested.txt", header = T, sep = "\t") 
+##movies<-movies[,c(1,2,3,4,9,10,5,6,7,8)]
+##BrainGVEx CMC HBCC LIBD MSBB_BM10 MSBB_BM22 MSBB_BM36 MSBB_BM44 Mayo ROSMAP
+p2<-as.ggplot(upset(movies, sets = c("BrainGVEx", "CMC", "HBCC", "LIBD", "Mayo", "ROSMAP", "MSBB_BM10", "MSBB_BM22", "MSBB_BM36","MSBB_BM44"), 
+    mainbar.y.label = "# of overlapped between cohorts", sets.x.label = "# of tested lncRNAs in each cohort", 
+order.by = "freq",number.angles = 20, point.size = 2.5, line.size = 1,text.scale = c(1.3, 1.3, 1, 1, 2, 1), keep.order = TRUE,sets.bar.color = "#56B4E9",queries = list(list(query = intersects, params = list("BrainGVEx", "CMC", "HBCC", "LIBD", "Mayo", "ROSMAP", "MSBB_BM10", "MSBB_BM22", "MSBB_BM36","MSBB_BM44"), active = T))))
+
+p2
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS2.b.pdf", p2,  width=8,height=6, units = "in", dpi = 300)  
+
+
+### Figure S3
+
+### Figure S3a
+
+
+data <- read.table(header=TRUE,sep="\t", text='
+cohort	type	num
+CMC/rRNA-depleted	all circRNAs	155212
+MSBB/rRNA-depleted	all circRNAs	76584
+LIBD/polyAselection	all circRNAs	12737
+Mayo/polyAselection	all circRNAs	4807
+HBCC/rRNA-depleted	all circRNAs	94436
+ROSMAP/rRNA-depleted	all circRNAs	130801
+BrainGVEx/rRNA-depleted	all circRNAs	76639
+CMC/rRNA-depleted	filtered circRNAs	19098
+MSBB/rRNA-depleted	filtered circRNAs	4564
+LIBD/polyAselection	filtered circRNAs	57
+Mayo/polyAselection	filtered circRNAs	124
+HBCC/rRNA-depleted	filtered circRNAs	21447
+ROSMAP/rRNA-depleted	filtered circRNAs	11476
+BrainGVEx/rRNA-depleted	filtered circRNAs	11490
+')
+
+
+p1<- ggplot(data, aes(fill=type, y=num, x=cohort, label = num)) + geom_bar(stat = "identity")+
+    geom_bar(position="dodge", stat="identity") + geom_text(aes(label = num), size = 3)+ylab("# of circRNAs")+xlab("Cohort") +  theme_bw() +
+    theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(axis.text.x = element_text(angle=65, vjust=0.5)) +   scale_fill_npg()+ scale_color_npg() + theme(legend.position='top') 
+
+p1
+    
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.a.circ.pdf", p1,  width = 8, height = 6, units = "in", dpi = 300)
+
+
+
+
+### Figure S3b
+
+library(dplyr)
+library(tidyr)
+
+
+df <- read.table(header=TRUE, sep="\t",text='
+cohort	exonic	intergenic	intronic	other
+CMC/rRNA-depleted	18526	145	107	320
+MSBB/rRNA-depleted	4451	26	19	68
+LIBD/polyAselection	47	0	0	10
+Mayo/polyAselection	101	1	2	20
+HBCC/rRNA-depleted	20705	181	140	421
+ROSMAP/rRNA-depleted	11189	78	58	151
+BrainGVEx/rRNA-depleted	11169	85	77	159
+')
+
+p2<-df %>% pivot_longer(.,-cohort, names_to = "features", values_to = "Value") %>%
+  ggplot(aes(x = cohort, y = Value, fill = features,label = Value))+ 
+  geom_bar(stat = "identity", position = "stack")+theme(axis.text.x = element_text(angle = 65, vjust = 0.5))+ ylab("# of circRNAs") + 
+  xlab("Cohort") +  theme_bw() +
+    theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(axis.text.x = element_text(angle=65, vjust=0.5)) +   scale_fill_npg()+ scale_color_npg() + theme(legend.position='top')  
+
+p2
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.b.circ.pdf", p2,  width = 8, height = 6, units = "in", dpi = 300) 
+
+### Figure S3c
+library(ggplot2)
+library(ggsci)
+df <- read.table(header=TRUE, sep="\t",text='
+cohort	num
+CMC/rRNA-depleted	0.928 
+MSBB/rRNA-depleted	0.921 
+LIBD/polyAselection	0.912 
+Mayo/polyAselection	0.855 
+HBCC/rRNA-depleted	0.910 
+ROSMAP/rRNA-depleted	0.938 
+BrainGVEx/rRNA-depleted	0.933 
+')
+
+
+p<-ggplot(data=df, aes(x=cohort, y=num,color=cohort)) +
+  geom_bar(stat="identity", fill="white")+ geom_text(aes(label = num), size = 3)+ xlab("Cohort")+ylab("Proportion of circRNAs by find_circ")+  theme_bw() +
+    theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) +theme(axis.text.x = element_text(angle = 65, vjust = 0.5))+ scale_color_npg() + scale_fill_npg()
+
+
+p
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.c.circ.pdf", p,  width = 8, height = 6, units = "in", dpi = 300) 
+
+### Figure S3d
+library(UpSetR)
+library(ggplotify)
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/circRNA/figures")
+movies <- read.table("overlapping_circ_10corhort2.tested.txt", header = T, sep = "\t") 
+##BrainGVEx CMC HBCC LIBD MSBB_BM10 MSBB_BM22 MSBB_BM36 MSBB_BM44 Mayo ROSMAP
+p1<-as.ggplot(upset(movies, sets = c("BrainGVEx", "CMC", "HBCC", "ROSMAP", "MSBB"), 
+    mainbar.y.label = "# of overlapped between cohorts", sets.x.label = "# of circRNAs in each cohort", 
+order.by = "freq",number.angles = 20, point.size = 2.5, line.size = 1,text.scale = c(1.3, 1.3, 1, 1, 2, 1), keep.order = TRUE,sets.bar.color = "#56B4E9",queries = list(list(query = intersects, params = list("BrainGVEx", "CMC", "HBCC", "ROSMAP", "MSBB"), active = T))))
+
+
+p1
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.e.circ.pdf", p1,  width=8,height=6, units = "in", dpi = 300)  
+
+### Figure S4
+
+### Figure S4a
+
+data <- read.table(header=TRUE,sep="\t", text='
+cohort	type	num
+CMC	tested circRNAs	18610
+HBCC	tested circRNAs	20780
+BrainGVEx	tested circRNAs	11224
+ROSMAP	tested circRNAs	11211
+meta	tested circRNAs	23548
+CMC	eCircRNAs (p<=5e-8)	1122
+HBCC	eCircRNAs (p<=5e-8)	42
+BrainGVEx	eCircRNAs (p<=5e-8)	301
+ROSMAP	eCircRNAs (p<=5e-8)	118
+meta	eCircRNAs (p<=5e-8)	1312
+')
+
+data$type<-factor(data$type,levels=c("tested circRNAs","eCircRNAs (p<=5e-8)"))
+data$cohort<-factor(data$cohort,levels=c("CMC","HBCC","BrainGVEx","ROSMAP","meta"))
+
+
+
+p1<- ggplot(data, aes(fill=type, y=num, x=cohort, label = num)) +
+    geom_bar(position="dodge", stat="identity") + geom_text(aes(label = num), size = 3)+ylab("# of circRNAs")+xlab("Cohort") +  theme_bw() +
+    theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(axis.text.x = element_text(angle=65, vjust=0.5)) +   scale_fill_npg()+ scale_color_npg() + theme(legend.position='top') 
+
+p1
+    
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS1.a.ecirc.pdf", p1,  width = 8, height = 6, units = "in", dpi = 300)
+
+
+
+
+### Figure S4b
+
+
+# Load library
+library(VennDiagram)
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/circRNA/figures")
+publication<-readLines("publication.txt")
+CMC<-readLines("CMC.txt")
+
+
+
+# Prepare a palette of 3 colors with R colorbrewer:
+library(RColorBrewer)
+myCol <- brewer.pal(3, "Pastel2")[1:2]
+
+# Chart
+venn.plot = venn.diagram(
+        x = list(publication, CMC),
+        category.names = c("Published" , "CMC" ),
+        filename = NULL,
+        output=NULL,
+        
+        # Output features
+        imagetype="png" ,
+        height = 480 , 
+        width = 480 , 
+        resolution = 300,
+        compression = "lzw",
+        
+        # Circles
+        lwd = 2,
+        lty = 'blank',
+        fill = myCol,
+        
+        # Numbers
+        cex = .6,
+        fontface = "bold",
+        fontfamily = "sans"
+        
+)
+   
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")   
+pdf(file="FigureS1.d.circ.pdf")
+grid.draw(venn.plot)
+dev.off()
+
+### Figure 5
+
+### Figure S5a
+
+
+
+library(dplyr)
+#### chromatin state enrichment                 
+data <- read.table(header=TRUE, text='
+name	Enrichment	sd	type
+TssA	2.749	0.11	PCG
+TssFlnkU	2.109	0.115	PCG
+TssBiv	1.783	0.148	PCG
+EnhG2	1.757	0.24	PCG
+TssFlnkD	1.679	0.492	PCG
+Tx	1.487	0.073	PCG
+EnhG1	1.3	0.186	PCG
+EnhA1	0.838	0.129	PCG
+TxWk	0.728	0.059	PCG
+TssFlnk	0.656	0.487	PCG
+EnhWk	0.608	0.159	PCG
+EnhBiv	0.462	0.252	PCG
+EnhA2	0.267	0.139	PCG
+ReprPC	0.033	0.167	PCG
+ZNF_Rpts	0.007	0.144	PCG
+ReprPCWk	-0.851	0.119	PCG
+Quies	-1.226	0.03	PCG
+Het	-1.271	0.186	PCG
+TssA	2.409	0.118	lncRNA
+TssFlnkU	2.006	0.108	lncRNA
+TssFlnkD	1.938	0.402	lncRNA
+TssFlnk	1.691	0.313	lncRNA
+TssBiv	1.688	0.138	lncRNA
+EnhG2	1.436	0.249	lncRNA
+Tx	1.287	0.068	lncRNA
+EnhG1	1.037	0.186	lncRNA
+EnhBiv	0.701	0.215	lncRNA
+TxWk	0.632	0.052	lncRNA
+EnhA1	0.444	0.131	lncRNA
+EnhWk	0.437	0.146	lncRNA
+ZNF_Rpts	0.369	0.117	lncRNA
+EnhA2	0.211	0.119	lncRNA
+ReprPC	0.024	0.146	lncRNA
+ReprPCWk	-0.578	0.1	lncRNA
+Quies	-0.815	0.022	lncRNA
+Het	-1.108	0.14	lncRNA
+EnhA1	-1.123	0.784	circRNA
+EnhA2	-1.643	0.974	circRNA
+EnhBiv	-0.962	1.4	circRNA
+EnhG1	0.001	0.241	circRNA
+EnhG2	-2.293	3.398	circRNA
+EnhWk	0.055	0.634	circRNA
+Het	-0.741	0.493	circRNA
+Quies	-0.762	0.067	circRNA
+ReprPC	-1.653	0.949	circRNA
+ReprPCWk	-2.033	0.548	circRNA
+TssA	2.58	0.599	circRNA
+TssBiv	0.361	0.92	circRNA
+TssFlnk	-0.633	3.36	circRNA
+TssFlnkD	2.751	1.51	circRNA
+TssFlnkU	1.026	0.731	circRNA
+Tx	1.988	0.204	circRNA
+TxWk	1.411	0.153	circRNA
+ZNF_Rpts	0.96	0.422	circRNA
+')
+
+data <- data  %>%  arrange(desc(Enrichment),name,desc(type))             
+data$name<-factor(data$name,levels=unique(data$name))  
+data$type<-factor(data$type,levels=c("circRNA","lncRNA","PCG"))
+p1<-ggplot(data, aes(x=name, y=(Enrichment), fill=type)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=Enrichment-sd, ymax=Enrichment+sd), width=.2,position=position_dodge(.9))+xlab("")+ ylab("Enrichment (log-odds ratio)") +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  )  + theme(legend.position='top') + coord_flip()  + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))
+ 
+p1
+
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.a2.pdf", p1,  width=8,height=6, units = "in", dpi = 300)  
+
+
+### Figure S5b
+
+data <- read.table(header=TRUE, text='
+name	Enrichment	sd	type
+H3K4me3	2.62	0.076	PCG
+H3K9ac	2.334	0.078	PCG
+H3K27ac	2.009	0.073	PCG
+H3K36me3	1.715	0.09	PCG
+H3K4me1	1.406	0.1	PCG
+H3K9me3	0.292	0.33	PCG
+H3K27me3	0.073	0.227	PCG
+H3K4me3	2.473	0.072	lncRNA
+H3K9ac	2.244	0.073	lncRNA
+H3K27ac	1.985	0.064	lncRNA
+H3K36me3	1.592	0.084	lncRNA
+H3K4me1	1.317	0.089	lncRNA
+H3K9me3	-0.131	0.326	lncRNA
+H3K27me3	-0.195	0.221	lncRNA
+H3K4me3	1.959	0.407	circRNA
+H3K9ac	1.39	0.39	circRNA
+H3K27ac	1.043	0.349	circRNA
+H3K36me3	2.57	0.272	circRNA
+H3K4me1	0.124	0.499	circRNA
+H3K9me3	0.316	1.081	circRNA
+H3K27me3	-1.495	1.191	circRNA
+')
+ 
+
+data <- data  %>%  arrange(desc(Enrichment),name,desc(type))             
+data$name<-factor(data$name,levels=unique(data$name))  
+data$type<-factor(data$type,levels=c("circRNA","lncRNA","PCG"))
+p2<-ggplot(data, aes(x=name, y=(Enrichment), fill=type)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=Enrichment-sd, ymax=Enrichment+sd), width=.2,position=position_dodge(.9))+xlab("")+ ylab("Enrichment (log-odds ratio)") +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top') + coord_flip()  + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))
+ 
+p2
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.b2.pdf", p2,  width=8,height=6, units = "in", dpi = 300)  
+
+### Figure S5c
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC")
+dat<-read.table("merge_results.sig.txt",sep="\t",header=TRUE)
+N<-length(dat$PP.H1)
+dat<-data.frame(type=c(rep("PP.H3",N),rep("PP.H4",N)),val=c(dat$PP.H3,dat$PP.H4))    
+p3<-ggplot(dat, aes(x=type, y=val, color=type))  +
+  geom_boxplot()+xlab("")+ylab("")+  theme_classic() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')   + scale_fill_npg()+ scale_color_npg()   
+
+  
+p3 
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.c1_1.pdf", p3,  width=8,height=6, units = "in", dpi = 300)  
+
+
+### Figure S5d
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC")
+dat1<-read.table("merge_results.sig5e_6.txt",sep="\t",header=TRUE)
+dat2<-read.table("merge_results.sig5e_7.txt",sep="\t",header=TRUE)
+dat3<-read.table("merge_results.sig5e_8.txt",sep="\t",header=TRUE)
+
+N1<-length(dat1$PP.H1)
+N2<-length(dat2$PP.H1)
+N3<-length(dat3$PP.H1)
+
+dat<-data.frame(type=c(rep("PP.H3",N1),rep("PP.H4",N1),rep("PP.H3",N2),rep("PP.H4",N2),rep("PP.H3",N3),rep("PP.H4",N3)),val=c(dat1$PP.H3,dat1$PP.H4,dat2$PP.H3,dat2$PP.H4,dat3$PP.H3,dat3$PP.H4),thres=c(rep("5e-6",N1),rep("5e-6",N1),rep("5e-7",N2),rep("5e-7",N2),rep("5e-8",N3),rep("5e-8",N3)),lnctype=c(dat1$lnctype,dat1$lnctype,dat2$lnctype,dat2$lnctype,dat3$lnctype,dat3$lnctype))    
+p4<-ggplot(dat, aes(x=type, y=val, color=type))+ facet_grid(lnctype ~ thres)  +
+  geom_boxplot()+xlab("")+ylab("")+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')   + scale_fill_npg()+ scale_color_npg()   
+
+p4 
+
+
+### Figure S5e
+
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC")
+dat1<-read.table("SNP_paired_LD.5e_8.r2.txt",sep="\t",header=TRUE)
+dat2<-read.table("SNP_paired_LD.5e_7.r2.txt",sep="\t",header=TRUE)
+dat3<-read.table("SNP_paired_LD.5e_6.r2.txt",sep="\t",header=TRUE)
+
+N1<-length(dat1$r2)
+N2<-length(dat2$r2)
+N3<-length(dat3$r2)
+
+dat<-data.frame(val=c(dat1$r2,dat2$r2,dat3$r2),thres=c(rep("5e-6",N1),rep("5e-7",N2),rep("5e-8",N3)))    
+p5 <- ggplot(dat, aes(x=val)) + facet_grid(. ~ thres)+   geom_density()+xlab("r2") +  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')   + scale_fill_npg()+ scale_color_npg()    
+  
+p5
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.e1.pdf", p5,  width=10,height=6, units = "in", dpi = 300)  
+
+###  Figure S6
+
+
+###  Figure S6a
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC/circ")
+dat<-read.table("merge_results_circ.txt",sep="\t",header=TRUE)
+N<-length(dat$PP.H1)
+dat<-data.frame(type=c(rep("PP.H3",N),rep("PP.H4",N)),val=c(dat$PP.H3,dat$PP.H4))    
+
+p<-ggplot(dat, aes(x=type, y=val, color=type))  +
+  geom_boxplot()+xlab("")+ylab("")
+p 
+
+p<-ggplot(dat, aes(x=type, y=val, color=type))  +
+  geom_violin(draw_quantiles = c( 0.5))+xlab("")+ylab("") +  theme_bw() +
+  theme(
+      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')  + scale_fill_npg()+ scale_color_npg() 
+p 
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.d1_1.circ.pdf", p,  width=8,height=6, units = "in", dpi = 300)  
+
+
+
+###  Figure S6b
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC")
+dat1<-read.table("merge_results.sig5e_6.txt",sep="\t",header=TRUE)
+dat2<-read.table("merge_results.sig5e_7.txt",sep="\t",header=TRUE)
+dat3<-read.table("merge_results.sig5e_8.txt",sep="\t",header=TRUE)
+
+N1<-length(dat1$PP.H1)
+N2<-length(dat2$PP.H1)
+N3<-length(dat3$PP.H1)
+
+dat<-data.frame(type=c(rep("PP.H3",N1),rep("PP.H4",N1),rep("PP.H3",N2),rep("PP.H4",N2),rep("PP.H3",N3),rep("PP.H4",N3)),val=c(dat1$PP.H3,dat1$PP.H4,dat2$PP.H3,dat2$PP.H4,dat3$PP.H3,dat3$PP.H4),thres=c(rep("5e-6",N1),rep("5e-6",N1),rep("5e-7",N2),rep("5e-7",N2),rep("5e-8",N3),rep("5e-8",N3)),lnctype=c(dat1$lnctype,dat1$lnctype,dat2$lnctype,dat2$lnctype,dat3$lnctype,dat3$lnctype))    
+p4<-ggplot(dat, aes(x=type, y=val, color=type))+ facet_grid(lnctype ~ thres)  +
+  geom_boxplot()+xlab("")+ylab("")+  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')   + scale_fill_npg()+ scale_color_npg()   
+
+p4 
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.d1_1.pdf", p4,  width=8,height=6, units = "in", dpi = 300)  
+
+
+
+
+###  Figure S6c
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC")
+dat1<-read.table("SNP_paired_LD.5e_8.r2.txt",sep="\t",header=TRUE)
+dat2<-read.table("SNP_paired_LD.5e_7.r2.txt",sep="\t",header=TRUE)
+dat3<-read.table("SNP_paired_LD.5e_6.r2.txt",sep="\t",header=TRUE)
+
+N1<-length(dat1$r2)
+N2<-length(dat2$r2)
+N3<-length(dat3$r2)
+
+dat<-data.frame(val=c(dat1$r2,dat2$r2,dat3$r2),thres=c(rep("5e-6",N1),rep("5e-7",N2),rep("5e-8",N3)))    
+p5 <- ggplot(dat, aes(x=val)) + facet_grid(. ~ thres)+   geom_density()+xlab("r2") +  theme_classic() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(legend.position='top')   + scale_fill_npg()+ scale_color_npg()    
+  
+p5
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS3.e1.pdf", p5,  width=10,height=6, units = "in", dpi = 300)  
+
+###  Figure S6d
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/eQTL_lnc/COLOC/circ")
+dat<-read.table("merge_results_circ.txt",sep="\t",header=TRUE)
+N<-length(dat$PP.H1)
+
+dat1<-read.table("SNP_paired_LD.5e_8.r2.txt",sep="\t",header=TRUE)
+N1<-length(dat1$r2)
+dat<-data.frame(type=c(rep("PP.H3",N),rep("PP.H4",N),rep("LD",N1)),val=c(dat$PP.H3,dat$PP.H4,dat1$r2))    
+
+dat$type<-factor(dat$type,levels=c("PP.H3","PP.H4","LD"))
+
+
+p<-ggplot(dat, aes(x=type, y=val, color=type))  +
+  geom_violin(draw_quantiles = c( 0.5))+xlab("")+ylab("") +  theme_bw() +
+  theme(
+      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8")) + theme(legend.position='top') 
+p 
+
+
+
+###  Figure S7
+
+### Figure S7a
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	Tau	Tau_SE	Prop	Prop_SE	enrichment	enrichment_SE
+AAM	lncRNA	2.386457631	0.398107879	7.48E-07	2.29137E-07	0.051855409	0.012848644	29.57090731	7.540714372
+AD	lncRNA	1.91144	0.485934534	3.70E-08	6.18291E-08	0.036878068	0.028840306	23.12909739	17.03379398
+ALS	lncRNA	2.534595775	0.651423058	1.12E-06	3.31823E-07	0.209223496	0.063036783	125.368855	37.42834154
+AN	lncRNA	2.165191548	0.756335125	6.57E-07	5.01564E-07	0.034705552	0.020800234	20.76922257	12.22144287
+BIP	lncRNA	2.687786099	0.343195349	1.47E-06	3.29271E-07	0.066277521	0.012565866	38.77875567	7.417613355
+CP	lncRNA	2.168135151	0.277886331	1.16E-06	1.91556E-07	0.074509882	0.010943662	43.24582889	6.385542672
+EA	lncRNA	2.433400383	0.299714756	6.20E-07	9.8947E-08	0.068053777	0.009724029	39.78801746	5.689468406
+Insomnia	lncRNA	3.068106082	0.429836066	2.31E-07	6.8175E-08	0.066586487	0.017125064	38.36866223	9.928534952
+IQ	lncRNA	2.094983106	0.294572368	1.10E-06	1.86713E-07	0.072918036	0.011244278	42.35041176	6.524254717
+MDD	lncRNA	2.822885089	0.374834657	4.34E-07	7.23245E-08	0.088563265	0.013791378	49.94963432	8.162195289
+neuroticism	lncRNA	2.260652378	0.334556404	5.29E-07	9.47401E-08	0.062875644	0.009837644	37.08526586	5.793889122
+PD	lncRNA	1.25635986	0.496262664	4.81E-08	5.03705E-08	0.050365541	0.035515021	28.36048677	21.04588825
+SCZ	lncRNA	2.662974359	0.341404986	4.05E-06	7.93651E-07	0.067996769	0.011763402	38.68369173	6.862338765
+SmkInt	lncRNA	1.859776237	0.302040715	2.02E-07	5.37408E-08	0.040729887	0.009116625	23.01209866	5.276894375
+AAM	PCG	3.389099396	0.513908032	1.85E-06	3.83105E-07	0.089678253	0.017159228	65.54294014	12.63065386
+AD	PCG	3.078580551	0.751223845	5.55E-07	1.37489E-07	0.211867709	0.04630098	156.1734158	34.03490481
+ALS	PCG	4.858137991	0.974187218	6.58E-07	3.54762E-07	0.108401161	0.051318031	81.17325707	37.60106431
+AN	PCG	2.775588927	0.842045304	1.68E-06	6.7858E-07	0.060639274	0.02235814	44.7322401	16.44618107
+BIP	PCG	3.924269008	0.41463446	2.99E-06	5.46595E-07	0.098320867	0.016657501	72.19026339	12.22938653
+CP	PCG	3.329836524	0.337990941	1.52E-06	2.26471E-07	0.076273907	0.010353685	55.86529018	7.624952157
+EA	PCG	3.768016236	0.379014743	7.19E-07	1.17553E-07	0.062474648	0.009339427	45.86703159	6.835187655
+Insomnia	PCG	4.866855334	0.618268211	3.95E-07	8.07761E-08	0.085088599	0.015982996	62.213375	11.80733148
+IQ	PCG	3.307273791	0.348040462	1.42E-06	2.30162E-07	0.074017783	0.011064412	54.22737073	8.124400634
+MDD	PCG	4.803749446	0.475699607	2.81E-07	7.79466E-08	0.049320702	0.01156904	35.41301863	8.481179779
+neuroticism	PCG	3.357411936	0.451022525	5.61E-07	1.35734E-07	0.053396258	0.011396947	39.34146695	8.3597257
+PD	PCG	2.176414044	0.702985741	3.39E-07	9.51977E-08	0.193544153	0.052799662	141.6126259	38.96161405
+SCZ	PCG	3.911139331	0.357527606	5.08E-06	9.03519E-07	0.066846506	0.010711239	48.66830197	7.881361112
+SmkInt	PCG	2.939839749	0.37847522	4.36E-07	7.00383E-08	0.062789328	0.00911326	45.75838717	6.669338467
+AAM	circRNA	0.581648775	0.5814717	1.26336E-06	7.14529E-07	0.006024006	0.004694195	30.90366526	24.0816209
+AD	circRNA	-0.701504739	0.799090346	-9.89363E-08	1.43052E-07	-0.008944096	0.007606337	-45.8839763	39.02115833
+ALS	circRNA	-2.354197258	2.35974092	-4.43833E-07	7.17227E-07	-0.017754251	0.014366303	-91.08082072	73.700359
+AN	circRNA	-0.546693198	1.638398004	-1.90398E-07	1.50497E-06	-0.002394173	0.007158478	-12.28231244	36.72360016
+BIP	circRNA	0.081154717	0.65534603	7.807E-07	8.28007E-07	0.000528958	0.003667793	2.713599823	18.81608969
+CP	circRNA	0.338303613	0.43657171	9.10614E-07	5.67305E-07	0.003014579	0.003745683	15.46504863	19.21567498
+EA	circRNA	0.078909439	0.429673732	2.73058E-07	2.21233E-07	0.000591024	0.002524116	3.032003152	12.94892764
+Insomnia	circRNA	0.733335387	0.940578947	2.54879E-07	2.14314E-07	0.004418508	0.006213739	22.66732235	31.87701286
+IQ	circRNA	0.275387454	0.427334773	8.13811E-07	5.18886E-07	0.002714696	0.003555637	13.92662193	18.24071987
+MDD	circRNA	2.510964544	0.832120465	7.4091E-07	2.36335E-07	0.013195711	0.005210149	67.69511986	26.72850728
+neuroticism	circRNA	-0.36532531	0.804851027	5.69065E-08	2.708E-07	-0.001736986	0.003352432	-8.910888237	17.19826151
+PD	circRNA	0.710766441	1.03274104	1.46467E-07	1.32938E-07	0.007846661	0.010808796	40.25403896	55.45004322
+SCZ	circRNA	0.943334966	0.403908807	6.40672E-06	2.02758E-06	0.00859743	0.003540977	44.10555004	18.16551205
+SmkInt	circRNA	1.393302417	0.751362207	4.09223E-07	2.03628E-07	0.006186585	0.003962673	31.73770991	20.3288487
+')
+
+
+#pi<-pi[pi$Type=="circRNA",]
+#pi$Type <- factor(pi$Type, levels = c("circRNA"))
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+
+median(pi[pi$Type %in% c("lncRNA"),]$Est)
+median(pi[pi$Type %in% c("PCG"),]$Est)
+mean(pi[pi$Type %in% c("lncRNA"),]$Est)
+mean(pi[pi$Type %in% c("PCG"),]$Est)
+
+
+p3= ggplot(pi, aes(Trait, Tau,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=Tau-1.96*Tau_SE, ymax=Tau+1.96*Tau_SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("") + ylab("Tau") + ggtitle("") +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8")) + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$Tau),linetype="dashed", color = "#E99C93")  + geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$Tau),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$Tau),linetype="dashed", color = "#B4DAA8")    +coord_flip()  + theme(legend.position = c(0.9, 0.5))
+  
+p3
+
+### Figure S7b
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	Tau	Tau_SE	Prop	Prop_SE	enrichment	enrichment_SE
+AAM	lncRNA	2.386457631	0.398107879	7.48E-07	2.29137E-07	0.051855409	0.012848644	29.57090731	7.540714372
+AD	lncRNA	1.91144	0.485934534	3.70E-08	6.18291E-08	0.036878068	0.028840306	23.12909739	17.03379398
+ALS	lncRNA	2.534595775	0.651423058	1.12E-06	3.31823E-07	0.209223496	0.063036783	125.368855	37.42834154
+AN	lncRNA	2.165191548	0.756335125	6.57E-07	5.01564E-07	0.034705552	0.020800234	20.76922257	12.22144287
+BIP	lncRNA	2.687786099	0.343195349	1.47E-06	3.29271E-07	0.066277521	0.012565866	38.77875567	7.417613355
+CP	lncRNA	2.168135151	0.277886331	1.16E-06	1.91556E-07	0.074509882	0.010943662	43.24582889	6.385542672
+EA	lncRNA	2.433400383	0.299714756	6.20E-07	9.8947E-08	0.068053777	0.009724029	39.78801746	5.689468406
+Insomnia	lncRNA	3.068106082	0.429836066	2.31E-07	6.8175E-08	0.066586487	0.017125064	38.36866223	9.928534952
+IQ	lncRNA	2.094983106	0.294572368	1.10E-06	1.86713E-07	0.072918036	0.011244278	42.35041176	6.524254717
+MDD	lncRNA	2.822885089	0.374834657	4.34E-07	7.23245E-08	0.088563265	0.013791378	49.94963432	8.162195289
+neuroticism	lncRNA	2.260652378	0.334556404	5.29E-07	9.47401E-08	0.062875644	0.009837644	37.08526586	5.793889122
+PD	lncRNA	1.25635986	0.496262664	4.81E-08	5.03705E-08	0.050365541	0.035515021	28.36048677	21.04588825
+SCZ	lncRNA	2.662974359	0.341404986	4.05E-06	7.93651E-07	0.067996769	0.011763402	38.68369173	6.862338765
+SmkInt	lncRNA	1.859776237	0.302040715	2.02E-07	5.37408E-08	0.040729887	0.009116625	23.01209866	5.276894375
+AAM	PCG	3.389099396	0.513908032	1.85E-06	3.83105E-07	0.089678253	0.017159228	65.54294014	12.63065386
+AD	PCG	3.078580551	0.751223845	5.55E-07	1.37489E-07	0.211867709	0.04630098	156.1734158	34.03490481
+ALS	PCG	4.858137991	0.974187218	6.58E-07	3.54762E-07	0.108401161	0.051318031	81.17325707	37.60106431
+AN	PCG	2.775588927	0.842045304	1.68E-06	6.7858E-07	0.060639274	0.02235814	44.7322401	16.44618107
+BIP	PCG	3.924269008	0.41463446	2.99E-06	5.46595E-07	0.098320867	0.016657501	72.19026339	12.22938653
+CP	PCG	3.329836524	0.337990941	1.52E-06	2.26471E-07	0.076273907	0.010353685	55.86529018	7.624952157
+EA	PCG	3.768016236	0.379014743	7.19E-07	1.17553E-07	0.062474648	0.009339427	45.86703159	6.835187655
+Insomnia	PCG	4.866855334	0.618268211	3.95E-07	8.07761E-08	0.085088599	0.015982996	62.213375	11.80733148
+IQ	PCG	3.307273791	0.348040462	1.42E-06	2.30162E-07	0.074017783	0.011064412	54.22737073	8.124400634
+MDD	PCG	4.803749446	0.475699607	2.81E-07	7.79466E-08	0.049320702	0.01156904	35.41301863	8.481179779
+neuroticism	PCG	3.357411936	0.451022525	5.61E-07	1.35734E-07	0.053396258	0.011396947	39.34146695	8.3597257
+PD	PCG	2.176414044	0.702985741	3.39E-07	9.51977E-08	0.193544153	0.052799662	141.6126259	38.96161405
+SCZ	PCG	3.911139331	0.357527606	5.08E-06	9.03519E-07	0.066846506	0.010711239	48.66830197	7.881361112
+SmkInt	PCG	2.939839749	0.37847522	4.36E-07	7.00383E-08	0.062789328	0.00911326	45.75838717	6.669338467
+AAM	circRNA	0.581648775	0.5814717	1.26336E-06	7.14529E-07	0.006024006	0.004694195	30.90366526	24.0816209
+AD	circRNA	-0.701504739	0.799090346	-9.89363E-08	1.43052E-07	-0.008944096	0.007606337	-45.8839763	39.02115833
+ALS	circRNA	-2.354197258	2.35974092	-4.43833E-07	7.17227E-07	-0.017754251	0.014366303	-91.08082072	73.700359
+AN	circRNA	-0.546693198	1.638398004	-1.90398E-07	1.50497E-06	-0.002394173	0.007158478	-12.28231244	36.72360016
+BIP	circRNA	0.081154717	0.65534603	7.807E-07	8.28007E-07	0.000528958	0.003667793	2.713599823	18.81608969
+CP	circRNA	0.338303613	0.43657171	9.10614E-07	5.67305E-07	0.003014579	0.003745683	15.46504863	19.21567498
+EA	circRNA	0.078909439	0.429673732	2.73058E-07	2.21233E-07	0.000591024	0.002524116	3.032003152	12.94892764
+Insomnia	circRNA	0.733335387	0.940578947	2.54879E-07	2.14314E-07	0.004418508	0.006213739	22.66732235	31.87701286
+IQ	circRNA	0.275387454	0.427334773	8.13811E-07	5.18886E-07	0.002714696	0.003555637	13.92662193	18.24071987
+MDD	circRNA	2.510964544	0.832120465	7.4091E-07	2.36335E-07	0.013195711	0.005210149	67.69511986	26.72850728
+neuroticism	circRNA	-0.36532531	0.804851027	5.69065E-08	2.708E-07	-0.001736986	0.003352432	-8.910888237	17.19826151
+PD	circRNA	0.710766441	1.03274104	1.46467E-07	1.32938E-07	0.007846661	0.010808796	40.25403896	55.45004322
+SCZ	circRNA	0.943334966	0.403908807	6.40672E-06	2.02758E-06	0.00859743	0.003540977	44.10555004	18.16551205
+SmkInt	circRNA	1.393302417	0.751362207	4.09223E-07	2.03628E-07	0.006186585	0.003962673	31.73770991	20.3288487
+')
+
+
+#pi<-pi[pi$Type=="circRNA",]
+#pi$Type <- factor(pi$Type, levels = c("circRNA"))
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+
+median(pi[pi$Type %in% c("lncRNA"),]$Est)
+median(pi[pi$Type %in% c("PCG"),]$Est)
+mean(pi[pi$Type %in% c("lncRNA"),]$Est)
+mean(pi[pi$Type %in% c("PCG"),]$Est)
+
+
+p3= ggplot(pi, aes(Trait, enrichment,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=enrichment-1.96*enrichment_SE, ymax=enrichment+1.96*enrichment_SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("") + ylab("Enrichment") + ggtitle("") +  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8")) + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$enrichment),linetype="dashed", color = "#E99C93")  + geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$enrichment),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$enrichment),linetype="dashed", color = "#B4DAA8")   +coord_flip()  + theme(legend.position = c(0.2, 0.9))
+  
+p3
+
+
+### Figure S7c
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	tau	tau_SE	Prop	Prop_SE
+AAM	lncRNA	36.86790521	7.560695581	1.04E-06	2.28E-07	0.063089997	0.012938198
+AD	lncRNA	38.94915452	18.06062802	1.30E-07	6.63E-08	0.066651523	0.030906149
+ALS	lncRNA	130.7804003	38.10991518	1.24E-06	3.35E-07	0.223797229	0.065215379
+AN	lncRNA	24.69348437	12.09179902	9.26E-07	4.86E-07	0.042256587	0.020692023
+BIP	lncRNA	45.8463495	7.201740696	1.94E-06	3.11E-07	0.078454309	0.012323938
+CP	lncRNA	49.25186907	6.348826048	1.41E-06	1.88E-07	0.084281985	0.010864393
+EA	lncRNA	44.08043514	5.602718197	7.32E-07	9.60E-08	0.075432398	0.00958762
+Insomnia	lncRNA	45.38857991	9.985495855	2.95E-07	6.81E-08	0.077670954	0.017087624
+IQ	lncRNA	47.98108651	6.567768658	1.32E-06	1.86E-07	0.082107366	0.011239057
+MDD	lncRNA	55.20347493	7.825518551	4.79E-07	6.80E-08	0.094466638	0.013391375
+neuroticism	lncRNA	40.61211245	5.516971491	6.19E-07	8.79E-08	0.06949725	0.009440887
+PD	lncRNA	45.29582318	22.48035922	1.05E-07	5.39E-08	0.077512224	0.038469389
+SCZ	lncRNA	44.28832855	6.720761625	4.83E-06	7.66E-07	0.075788155	0.011500866
+SmkInt	lncRNA	28.53755028	5.330012841	2.73E-07	5.37E-08	0.048834723	0.009120955
+AAM	PCG	71.74346309	12.50741174	2.07E-06	3.78E-07	0.097737481	0.017039084
+AD	PCG	158.073849	34.55698134	5.67E-07	1.39E-07	0.215347003	0.047077631
+ALS	PCG	109.2722664	40.93706501	1.02E-06	3.81E-07	0.148863682	0.05576934
+AN	PCG	48.32454101	16.22027483	1.88E-06	6.59E-07	0.065833439	0.022097188
+BIP	PCG	79.97880049	11.89707296	3.43E-06	5.24E-07	0.108956637	0.016207608
+CP	PCG	65.64145447	7.615852348	1.88E-06	2.24E-07	0.089424599	0.01037522
+EA	PCG	54.42123922	6.777374437	9.08E-07	1.15E-07	0.074139087	0.009232946
+Insomnia	PCG	70.69473133	11.70984122	4.67E-07	7.95E-08	0.096308774	0.015952539
+IQ	PCG	63.51583212	8.196228771	1.76E-06	2.29E-07	0.086528823	0.011165878
+MDD	PCG	47.89172065	8.185803677	4.15E-07	7.40E-08	0.0652438	0.011151676
+neuroticism	PCG	47.27388267	8.036473493	7.24E-07	1.29E-07	0.064402107	0.01094824
+PD	PCG	146.8814263	39.92099409	3.55E-07	9.74E-08	0.200099354	0.054385128
+SCZ	PCG	57.33352129	7.754100865	6.30E-06	8.77E-07	0.078106544	0.010563559
+SmkInt	PCG	50.94926381	6.664904513	4.98E-07	6.95E-08	0.069409149	0.009079726
+AAM	circRNA	44.08047527	23.97779281	1.26E-06	7.06E-07	0.008592543	0.004673956
+AD	circRNA	-25.11798354	38.04800164	-9.89E-08	1.38E-07	-0.004896212	0.007416641
+ALS	circRNA	-44.12409284	71.14740162	-4.44E-07	6.85E-07	-0.008601045	0.013868659
+AN	circRNA	-3.006717505	36.49381434	-1.90E-07	1.49E-06	-0.000586095	0.007113686
+BIP	circRNA	19.18643258	18.63734091	7.81E-07	8.17E-07	0.003739983	0.00363295
+CP	circRNA	32.41633887	19.48625216	9.11E-07	5.71E-07	0.006318869	0.003798427
+EA	circRNA	17.27600427	12.87896663	2.73E-07	2.20E-07	0.003367586	0.002510478
+Insomnia	circRNA	39.34667362	31.99310646	2.55E-07	2.14E-07	0.00766979	0.006236369
+IQ	circRNA	30.05128445	18.26073303	8.14E-07	5.18E-07	0.005857853	0.003559538
+MDD	circRNA	85.26481384	26.07591604	7.41E-07	2.29E-07	0.016620545	0.00508294
+neuroticism	circRNA	4.830880168	16.91567634	5.69E-08	2.65E-07	0.000941676	0.003297348
+PD	circRNA	62.20678174	54.84112449	1.46E-07	1.28E-07	0.012125877	0.0106901
+SCZ	circRNA	58.16834969	18.42335852	6.41E-06	2.04E-06	0.011338671	0.003591238
+SmkInt	circRNA	41.97605354	20.57609132	4.09E-07	2.05E-07	0.008182331	0.004010867
+')
+
+
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+p1= ggplot(pi, aes(Trait, tau,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=tau-1.96*tau_SE, ymax=tau+1.96*tau_SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("") + ylab("Tau") + ggtitle("") +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$tau),linetype="dashed", color = "#E99C93")+ geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$tau),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$tau),linetype="dashed", color = "#B4DAA8")  + coord_flip()   + theme(legend.position = c(0.9, 0.5))
+  
+p1
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS5.maginal.b1_tau.pdf", p1,  width=6,height=6, units = "in", dpi = 300)  
+
+
+### Figure S7d
+
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	tau	tau_SE	Prop	Prop_SE
+AAM	lncRNA	36.86790521	7.560695581	1.04E-06	2.28E-07	0.063089997	0.012938198
+AD	lncRNA	38.94915452	18.06062802	1.30E-07	6.63E-08	0.066651523	0.030906149
+ALS	lncRNA	130.7804003	38.10991518	1.24E-06	3.35E-07	0.223797229	0.065215379
+AN	lncRNA	24.69348437	12.09179902	9.26E-07	4.86E-07	0.042256587	0.020692023
+BIP	lncRNA	45.8463495	7.201740696	1.94E-06	3.11E-07	0.078454309	0.012323938
+CP	lncRNA	49.25186907	6.348826048	1.41E-06	1.88E-07	0.084281985	0.010864393
+EA	lncRNA	44.08043514	5.602718197	7.32E-07	9.60E-08	0.075432398	0.00958762
+Insomnia	lncRNA	45.38857991	9.985495855	2.95E-07	6.81E-08	0.077670954	0.017087624
+IQ	lncRNA	47.98108651	6.567768658	1.32E-06	1.86E-07	0.082107366	0.011239057
+MDD	lncRNA	55.20347493	7.825518551	4.79E-07	6.80E-08	0.094466638	0.013391375
+neuroticism	lncRNA	40.61211245	5.516971491	6.19E-07	8.79E-08	0.06949725	0.009440887
+PD	lncRNA	45.29582318	22.48035922	1.05E-07	5.39E-08	0.077512224	0.038469389
+SCZ	lncRNA	44.28832855	6.720761625	4.83E-06	7.66E-07	0.075788155	0.011500866
+SmkInt	lncRNA	28.53755028	5.330012841	2.73E-07	5.37E-08	0.048834723	0.009120955
+AAM	PCG	71.74346309	12.50741174	2.07E-06	3.78E-07	0.097737481	0.017039084
+AD	PCG	158.073849	34.55698134	5.67E-07	1.39E-07	0.215347003	0.047077631
+ALS	PCG	109.2722664	40.93706501	1.02E-06	3.81E-07	0.148863682	0.05576934
+AN	PCG	48.32454101	16.22027483	1.88E-06	6.59E-07	0.065833439	0.022097188
+BIP	PCG	79.97880049	11.89707296	3.43E-06	5.24E-07	0.108956637	0.016207608
+CP	PCG	65.64145447	7.615852348	1.88E-06	2.24E-07	0.089424599	0.01037522
+EA	PCG	54.42123922	6.777374437	9.08E-07	1.15E-07	0.074139087	0.009232946
+Insomnia	PCG	70.69473133	11.70984122	4.67E-07	7.95E-08	0.096308774	0.015952539
+IQ	PCG	63.51583212	8.196228771	1.76E-06	2.29E-07	0.086528823	0.011165878
+MDD	PCG	47.89172065	8.185803677	4.15E-07	7.40E-08	0.0652438	0.011151676
+neuroticism	PCG	47.27388267	8.036473493	7.24E-07	1.29E-07	0.064402107	0.01094824
+PD	PCG	146.8814263	39.92099409	3.55E-07	9.74E-08	0.200099354	0.054385128
+SCZ	PCG	57.33352129	7.754100865	6.30E-06	8.77E-07	0.078106544	0.010563559
+SmkInt	PCG	50.94926381	6.664904513	4.98E-07	6.95E-08	0.069409149	0.009079726
+AAM	circRNA	44.08047527	23.97779281	1.26E-06	7.06E-07	0.008592543	0.004673956
+AD	circRNA	-25.11798354	38.04800164	-9.89E-08	1.38E-07	-0.004896212	0.007416641
+ALS	circRNA	-44.12409284	71.14740162	-4.44E-07	6.85E-07	-0.008601045	0.013868659
+AN	circRNA	-3.006717505	36.49381434	-1.90E-07	1.49E-06	-0.000586095	0.007113686
+BIP	circRNA	19.18643258	18.63734091	7.81E-07	8.17E-07	0.003739983	0.00363295
+CP	circRNA	32.41633887	19.48625216	9.11E-07	5.71E-07	0.006318869	0.003798427
+EA	circRNA	17.27600427	12.87896663	2.73E-07	2.20E-07	0.003367586	0.002510478
+Insomnia	circRNA	39.34667362	31.99310646	2.55E-07	2.14E-07	0.00766979	0.006236369
+IQ	circRNA	30.05128445	18.26073303	8.14E-07	5.18E-07	0.005857853	0.003559538
+MDD	circRNA	85.26481384	26.07591604	7.41E-07	2.29E-07	0.016620545	0.00508294
+neuroticism	circRNA	4.830880168	16.91567634	5.69E-08	2.65E-07	0.000941676	0.003297348
+PD	circRNA	62.20678174	54.84112449	1.46E-07	1.28E-07	0.012125877	0.0106901
+SCZ	circRNA	58.16834969	18.42335852	6.41E-06	2.04E-06	0.011338671	0.003591238
+SmkInt	circRNA	41.97605354	20.57609132	4.09E-07	2.05E-07	0.008182331	0.004010867
+')
+
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+p1= ggplot(pi, aes(Trait, Est,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=Est-1.96*SE, ymax=Est+1.96*SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("")   + ylab("Enrichment") + ggtitle("") +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$Est),linetype="dashed", color = "#E99C93")+ geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$Est),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$Est),linetype="dashed", color = "#B4DAA8")  + coord_flip()   + theme(legend.position = c(0.9, 0.5))
+  
+p1
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS5.maginal.b1_Est.pdf", p1,  width=6,height=6, units = "in", dpi = 300)  
+
+### Figure S7e
+
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	tau	tau_SE	Prop	Prop_SE
+AAM	lncRNA	36.86790521	7.560695581	1.04E-06	2.28E-07	0.063089997	0.012938198
+AD	lncRNA	38.94915452	18.06062802	1.30E-07	6.63E-08	0.066651523	0.030906149
+ALS	lncRNA	130.7804003	38.10991518	1.24E-06	3.35E-07	0.223797229	0.065215379
+AN	lncRNA	24.69348437	12.09179902	9.26E-07	4.86E-07	0.042256587	0.020692023
+BIP	lncRNA	45.8463495	7.201740696	1.94E-06	3.11E-07	0.078454309	0.012323938
+CP	lncRNA	49.25186907	6.348826048	1.41E-06	1.88E-07	0.084281985	0.010864393
+EA	lncRNA	44.08043514	5.602718197	7.32E-07	9.60E-08	0.075432398	0.00958762
+Insomnia	lncRNA	45.38857991	9.985495855	2.95E-07	6.81E-08	0.077670954	0.017087624
+IQ	lncRNA	47.98108651	6.567768658	1.32E-06	1.86E-07	0.082107366	0.011239057
+MDD	lncRNA	55.20347493	7.825518551	4.79E-07	6.80E-08	0.094466638	0.013391375
+neuroticism	lncRNA	40.61211245	5.516971491	6.19E-07	8.79E-08	0.06949725	0.009440887
+PD	lncRNA	45.29582318	22.48035922	1.05E-07	5.39E-08	0.077512224	0.038469389
+SCZ	lncRNA	44.28832855	6.720761625	4.83E-06	7.66E-07	0.075788155	0.011500866
+SmkInt	lncRNA	28.53755028	5.330012841	2.73E-07	5.37E-08	0.048834723	0.009120955
+AAM	PCG	71.74346309	12.50741174	2.07E-06	3.78E-07	0.097737481	0.017039084
+AD	PCG	158.073849	34.55698134	5.67E-07	1.39E-07	0.215347003	0.047077631
+ALS	PCG	109.2722664	40.93706501	1.02E-06	3.81E-07	0.148863682	0.05576934
+AN	PCG	48.32454101	16.22027483	1.88E-06	6.59E-07	0.065833439	0.022097188
+BIP	PCG	79.97880049	11.89707296	3.43E-06	5.24E-07	0.108956637	0.016207608
+CP	PCG	65.64145447	7.615852348	1.88E-06	2.24E-07	0.089424599	0.01037522
+EA	PCG	54.42123922	6.777374437	9.08E-07	1.15E-07	0.074139087	0.009232946
+Insomnia	PCG	70.69473133	11.70984122	4.67E-07	7.95E-08	0.096308774	0.015952539
+IQ	PCG	63.51583212	8.196228771	1.76E-06	2.29E-07	0.086528823	0.011165878
+MDD	PCG	47.89172065	8.185803677	4.15E-07	7.40E-08	0.0652438	0.011151676
+neuroticism	PCG	47.27388267	8.036473493	7.24E-07	1.29E-07	0.064402107	0.01094824
+PD	PCG	146.8814263	39.92099409	3.55E-07	9.74E-08	0.200099354	0.054385128
+SCZ	PCG	57.33352129	7.754100865	6.30E-06	8.77E-07	0.078106544	0.010563559
+SmkInt	PCG	50.94926381	6.664904513	4.98E-07	6.95E-08	0.069409149	0.009079726
+AAM	circRNA	44.08047527	23.97779281	1.26E-06	7.06E-07	0.008592543	0.004673956
+AD	circRNA	-25.11798354	38.04800164	-9.89E-08	1.38E-07	-0.004896212	0.007416641
+ALS	circRNA	-44.12409284	71.14740162	-4.44E-07	6.85E-07	-0.008601045	0.013868659
+AN	circRNA	-3.006717505	36.49381434	-1.90E-07	1.49E-06	-0.000586095	0.007113686
+BIP	circRNA	19.18643258	18.63734091	7.81E-07	8.17E-07	0.003739983	0.00363295
+CP	circRNA	32.41633887	19.48625216	9.11E-07	5.71E-07	0.006318869	0.003798427
+EA	circRNA	17.27600427	12.87896663	2.73E-07	2.20E-07	0.003367586	0.002510478
+Insomnia	circRNA	39.34667362	31.99310646	2.55E-07	2.14E-07	0.00766979	0.006236369
+IQ	circRNA	30.05128445	18.26073303	8.14E-07	5.18E-07	0.005857853	0.003559538
+MDD	circRNA	85.26481384	26.07591604	7.41E-07	2.29E-07	0.016620545	0.00508294
+neuroticism	circRNA	4.830880168	16.91567634	5.69E-08	2.65E-07	0.000941676	0.003297348
+PD	circRNA	62.20678174	54.84112449	1.46E-07	1.28E-07	0.012125877	0.0106901
+SCZ	circRNA	58.16834969	18.42335852	6.41E-06	2.04E-06	0.011338671	0.003591238
+SmkInt	circRNA	41.97605354	20.57609132	4.09E-07	2.05E-07	0.008182331	0.004010867
+')
+
+
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+p1= ggplot(pi, aes(Trait, Prop,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=Prop-1.96*Prop_SE, ymax=Prop+1.96*Prop_SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0, 0)) +
+  xlab("")   + ylab(bquote(paste("Pr(",paste(italic(h)[g]^{2},")",sep=" ")))) + ggtitle("") +  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$Prop),linetype="dashed", color = "#E99C93")+ geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$Prop),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$Prop),linetype="dashed", color = "#B4DAA8")  + coord_flip()   + theme(legend.position = c(0.9, 0.5))
+  
+p1
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("FigureS5.maginal.b1_Prop.pdf", p1,  width=6,height=6, units = "in", dpi = 300)  
+
+
+### Figure S7f
+pi <- read.table(header=TRUE, text='
+Trait	Type	Est	SE	Tau	Prop	Prop_SE
+AAM	lncRNA	2.386457631	0.398107879	7.48E-07	0.051855409	0.012848644
+AD	lncRNA	1.91144	0.485934534	3.70E-08	0.036878068	0.028840306
+ALS	lncRNA	2.534595775	0.651423058	1.12E-06	0.209223496	0.063036783
+AN	lncRNA	2.165191548	0.756335125	6.57E-07	0.034705552	0.020800234
+BIP	lncRNA	2.687786099	0.343195349	1.47E-06	0.066277521	0.012565866
+CP	lncRNA	2.168135151	0.277886331	1.16E-06	0.074509882	0.010943662
+EA	lncRNA	2.433400383	0.299714756	6.20E-07	0.068053777	0.009724029
+Insomnia	lncRNA	3.068106082	0.429836066	2.31E-07	0.066586487	0.017125064
+IQ	lncRNA	2.094983106	0.294572368	1.10E-06	0.072918036	0.011244278
+MDD	lncRNA	2.822885089	0.374834657	4.34E-07	0.088563265	0.013791378
+neuroticism	lncRNA	2.260652378	0.334556404	5.29E-07	0.062875644	0.009837644
+PD	lncRNA	1.25635986	0.496262664	4.81E-08	0.050365541	0.035515021
+SCZ	lncRNA	2.662974359	0.341404986	4.05E-06	0.067996769	0.011763402
+SmkInt	lncRNA	1.859776237	0.302040715	2.02E-07	0.040729887	0.009116625
+AAM	PCG	3.389099396	0.513908032	1.85E-06	0.089678253	0.017159228
+AD	PCG	3.078580551	0.751223845	5.55E-07	0.211867709	0.04630098
+ALS	PCG	4.858137991	0.974187218	6.58E-07	0.108401161	0.051318031
+AN	PCG	2.775588927	0.842045304	1.68E-06	0.060639274	0.02235814
+BIP	PCG	3.924269008	0.41463446	2.99E-06	0.098320867	0.016657501
+CP	PCG	3.329836524	0.337990941	1.52E-06	0.076273907	0.010353685
+EA	PCG	3.768016236	0.379014743	7.19E-07	0.062474648	0.009339427
+Insomnia	PCG	4.866855334	0.618268211	3.95E-07	0.085088599	0.015982996
+IQ	PCG	3.307273791	0.348040462	1.42E-06	0.074017783	0.011064412
+MDD	PCG	4.803749446	0.475699607	2.81E-07	0.049320702	0.01156904
+neuroticism	PCG	3.357411936	0.451022525	5.61E-07	0.053396258	0.011396947
+PD	PCG	2.176414044	0.702985741	3.39E-07	0.193544153	0.052799662
+SCZ	PCG	3.911139331	0.357527606	5.08E-06	0.066846506	0.010711239
+SmkInt	PCG	2.939839749	0.37847522	4.36E-07	0.062789328	0.00911326
+AAM	circRNA	3.389099396	0.513908032	1.26336E-06	0.006024006	0.004694195
+AD	circRNA	3.078580551	0.751223845	-9.89363E-08	-0.008944096	0.007606337
+ALS	circRNA	4.858137991	0.974187218	-4.43833E-07	-0.017754251	0.014366303
+AN	circRNA	2.775588927	0.842045304	-1.90398E-07	-0.002394173	0.007158478
+BIP	circRNA	3.924269008	0.41463446	7.807E-07	0.000528958	0.003667793
+CP	circRNA	3.329836524	0.337990941	9.10614E-07	0.003014579	0.003745683
+EA	circRNA	3.768016236	0.379014743	2.73058E-07	0.000591024	0.002524116
+Insomnia	circRNA	4.866855334	0.618268211	2.54879E-07	0.004418508	0.006213739
+IQ	circRNA	3.307273791	0.348040462	8.13811E-07	0.002714696	0.003555637
+MDD	circRNA	4.803749446	0.475699607	7.4091E-07	0.013195711	0.005210149
+neuroticism	circRNA	3.357411936	0.451022525	5.69065E-08	-0.001736986	0.003352432
+PD	circRNA	2.176414044	0.702985741	1.46467E-07	0.007846661	0.010808796
+SCZ	circRNA	3.911139331	0.357527606	6.40672E-06	0.00859743	0.003540977
+SmkInt	circRNA	2.939839749	0.37847522	4.09223E-07	0.006186585	0.003962673
+')
+
+
+pi$Type <- factor(pi$Type, levels = c("circRNA","lncRNA","PCG"))
+pi$Trait <- factor(pi$Trait, levels = c("AAM","AD","ALS","AN","BIP","CP","EA","Insomnia","IQ","MDD","neuroticism","PD","SCZ","SmkInt"))
+
+
+median(pi[pi$Type %in% c("lncRNA"),]$Prop)
+median(pi[pi$Type %in% c("PCG"),]$Prop)
+mean(pi[pi$Type %in% c("lncRNA"),]$Prop)
+mean(pi[pi$Type %in% c("PCG"),]$Prop)
+
+p2= ggplot(pi, aes(Trait, Prop ,fill=Type)) + 
+  geom_bar(width=0.8,position=position_dodge(width=0.85), stat="identity") + geom_errorbar(aes(ymin=Prop-1.96*Prop_SE, ymax=Prop+1.96*Prop_SE), width=0.2,size=0.8,position=position_dodge(width=0.85)) +  
+  scale_x_discrete(expand = c(0.0, 0)) +
+  xlab("") + ylab(bquote(paste("Pr(",paste(italic(h)[g]^{2},")",sep=" ")))) + ggtitle("")  + theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8"))  + geom_hline(yintercept=median(pi[pi$Type %in% c("circRNA"),]$Prop),linetype="dashed", color = "#E99C93")+ geom_hline(yintercept=median(pi[pi$Type %in% c("lncRNA"),]$Prop),linetype="dashed", color = "#80ACF9") + geom_hline(yintercept=median(pi[pi$Type %in% c("PCG"),]$Prop),linetype="dashed", color = "#B4DAA8")  + coord_flip() 
+  
+  
+p2 
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure3.b1.pdf", p2,  width =7, height = 6, units = "in", dpi = 300)
+
+
+### Figure S8
+
+### Figure S8a
+
+library(tidyverse)
+library(ggplot2)
+library(ggpubr)
+library(cowplot)
+library(ggExtra)
+
+dat<-data.frame()
+exp<-read.table(file="/storage/yangjianLab/chenli/seq/PsychENCODE/ROSMAP/eQTL1/newlncRNA_exp.PEER1.PEER_residuals.txt",sep="\t",header=T);  
+exp1<-unlist(exp["ENSG00000285184.3_6",])
+exp2<-unlist(exp["ENSG00000136631.15_10",])
+
+
+df <-data.frame(group=rep("ROSMAP",2*length(exp1)),exp1=exp1,exp2=exp2)
+dat<-rbind(dat,df) 
+
+exp<-read.table(file="/storage/yangjianLab/chenli/seq/PsychENCODE/CMC/merge/eQTL1/newlncRNA_exp.PEER1.PEER_residuals.txt",sep="\t",header=T);  
+exp1<-unlist(exp["ENSG00000285184.3_6",])
+exp2<-unlist(exp["ENSG00000136631.15_10",])
+
+df <-data.frame(group=rep("CMC",2*length(exp1)),exp1=exp1,exp2=exp2)
+dat<-rbind(dat,df)
+
+exp<-read.table(file="/storage/yangjianLab/chenli/seq/PsychENCODE/BrainGVEx/eQTL1/newlncRNA_exp.PEER1.PEER_residuals.txt",sep="\t",header=T);  
+exp1<-unlist(exp["ENSG00000285184.3_6",])
+exp2<-unlist(exp["ENSG00000136631.15_10",])
+
+df <-data.frame(group=rep("BrainGVEx",2*length(exp1)),exp1=exp1,exp2=exp2)
+dat<-rbind(dat,df)
+
+exp<-read.table(file="/storage/yangjianLab/chenli/seq/PsychENCODE/HBCC/eQTL1/newlncRNA_exp.PEER1.PEER_residuals.txt",sep="\t",header=T);  
+exp1<-unlist(exp["ENSG00000285184.3_6",])
+exp2<-unlist(exp["ENSG00000136631.15_10",])
+
+df <-data.frame(group=rep("HBCC",2*length(exp1)),exp1=exp1,exp2=exp2)
+dat<-rbind(dat,df)
+
+
+exp<-read.table(file="/storage/yangjianLab/chenli/seq/PsychENCODE/Mayo/eQTL1/newlncRNA_exp.PEER1.PEER_residuals.txt",sep="\t",header=T);  
+exp1<-unlist(exp["ENSG00000285184.3_6",])
+exp2<-unlist(exp["ENSG00000136631.15_10",])
+
+df <-data.frame(group=rep("Mayo",2*length(exp1)),exp1=exp1,exp2=exp2)
+dat<-rbind(dat,df)
+
+
+exp<-read.table(file="/storage/yangjianLab/chenli/seq/PsychENCODE/LIBD/eQTL1/newlncRNA_exp.PEER1.PEER_residuals.txt",sep="\t",header=T);  
+exp1<-unlist(exp["ENSG00000285184.3_6",])
+exp2<-unlist(exp["ENSG00000136631.15_10",])
+
+df <-data.frame(group=rep("LIBD",2*length(exp1)),exp1=exp1,exp2=exp2)
+dat<-rbind(dat,df)
+
+
+
+dat$group <- as.factor(dat$group)
+
+library(ggplot2)
+library(ggpubr)
+library(ggExtra)
+
+p <- ggplot(dat,aes(x =exp1,y = exp2,color=group)) +
+  geom_point(size = 2,alpha = 0.5) +xlab("ENSG00000285184") +ylab("VPS45") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(0, 0, 0, 0, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + theme(axis.text.x = element_text(angle = 60, vjust=1, hjust=1, colour="black")) +
+  geom_smooth(method = 'lm',se = T,size = 1.5,fill = '#FEA82F') +
+  stat_cor(method = "pearson",digits = 3,size=6)  + scale_color_npg() + scale_fill_npg()  + theme(legend.position='top') 
+
+p
+
+ggsave("Figure.cor.ENSG00000285184.VPS45.pdf", p,  width=8,height=6, units = "in", dpi = 300)      
+
+ggMarginal(p,type = "densigram",
+           xparams = list(binwidth = 0.1, fill = "#B3E283",size = .7),
+           yparams = list(binwidth = 0.1, fill = "#8AB6D6",size = .7)) 
+ 
+ 
+ 
+
+### Figure S8b
+
+
+library(reshape2)
+library(ggplot2)
+library("ggsci")
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/LIBD/meta/SuperAgerEpiMap")
+dat<-read.table(file='SuperAgerEpiMap.idmap.PFC.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("ENSG00000285184"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_PFC <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_PFC$type1<-"PFC"
+data_long_PFC$type<-0
+data_long_PFC$type[grep("_N",data_long_PFC$condition)]="Neuro"        
+data_long_PFC$type[grep("_G",data_long_PFC$condition)]="non-Neuro"  
+data_long_PFC$type <- factor(data_long_PFC$type , levels = c("Neuro", "non-Neuro"))
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.FG.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("ENSG00000285184"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_FG <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_FG$type1<-"FG"
+data_long_FG$type<-0
+data_long_FG$type[grep("_N",data_long_FG$condition)]="Neuro"        
+data_long_FG$type[grep("_G",data_long_FG$condition)]="non-Neuro"  
+data_long_FG$type <- factor(data_long_FG$type , levels = c("Neuro", "non-Neuro"))
+
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.IFG.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("ENSG00000285184"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_IFG <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_IFG$type1<-"IFG"
+data_long_IFG$type<-0
+data_long_IFG$type[grep("_N",data_long_IFG$condition)]="Neuro"        
+data_long_IFG$type[grep("_G",data_long_IFG$condition)]="non-Neuro"  
+data_long_IFG$type <- factor(data_long_IFG$type , levels = c("Neuro", "non-Neuro"))
+
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.PVC.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("ENSG00000285184"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_PVC <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_PVC$type1<-"PVC"
+data_long_PVC$type<-0
+data_long_PVC$type[grep("_N",data_long_PVC$condition)]="Neuro"        
+data_long_PVC$type[grep("_G",data_long_PVC$condition)]="non-Neuro"  
+data_long_PVC$type <- factor(data_long_PVC$type , levels = c("Neuro", "non-Neuro"))
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.STG.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("ENSG00000285184"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_STG <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_STG$type1<-"STG"
+data_long_STG$type<-0
+data_long_STG$type[grep("_N",data_long_STG$condition)]="Neuro"        
+data_long_STG$type[grep("_G",data_long_STG$condition)]="non-Neuro"  
+data_long_STG$type <- factor(data_long_STG$type , levels = c("Neuro", "non-Neuro"))
+
+data_long<-rbind(data_long_PFC,data_long_FG,data_long_IFG,data_long_PVC,data_long_STG)
+p<-ggplot(data_long, aes(x=type1, y=exp, fill=type))  +
+  geom_boxplot() +xlab("")+ ylab("Nornalized expression (TPM)")+ggtitle("")+ scale_color_npg() + scale_fill_npg() +
+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  )  + theme(legend.position='top')   + scale_fill_manual(values = c( "#80ACF9","#B4DAA8"))
+p
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure.tmp.DE1_1.ENSG00000285184.pdf", p,  width = 6, height = 6, units = "in", dpi = 300)
+
+
+
+### Figure S9
+
+### Figure S9a
+
+library(reshape2)
+library(ggplot2)
+library("ggsci")
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/LIBD/meta/SuperAgerEpiMap")
+dat<-read.table(file='SuperAgerEpiMap.idmap.PFC.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long$type<-0
+data_long$type[grep("_N$",data_long$condition)]="Neuro"        
+data_long$type[grep("_G$",data_long$condition)]="non-Neuro"   
+
+
+
+library(reshape2)
+library(ggplot2)
+library("ggsci")
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/LIBD/meta/SuperAgerEpiMap")
+dat<-read.table(file='SuperAgerEpiMap.idmap.PFC.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_PFC <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_PFC$type1<-"PFC"
+data_long_PFC$type<-0
+data_long_PFC$type[grep("_N",data_long_PFC$condition)]="Neuro"        
+data_long_PFC$type[grep("_G",data_long_PFC$condition)]="non-Neuro"  
+data_long_PFC$type <- factor(data_long_PFC$type , levels = c("Neuro", "non-Neuro"))
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.FG.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_FG <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_FG$type1<-"FG"
+data_long_FG$type<-0
+data_long_FG$type[grep("_N",data_long_FG$condition)]="Neuro"        
+data_long_FG$type[grep("_G",data_long_FG$condition)]="non-Neuro"  
+data_long_FG$type <- factor(data_long_FG$type , levels = c("Neuro", "non-Neuro"))
+
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.IFG.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_IFG <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_IFG$type1<-"IFG"
+data_long_IFG$type<-0
+data_long_IFG$type[grep("_N",data_long_IFG$condition)]="Neuro"        
+data_long_IFG$type[grep("_G",data_long_IFG$condition)]="non-Neuro"  
+data_long_IFG$type <- factor(data_long_IFG$type , levels = c("Neuro", "non-Neuro"))
+
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.PVC.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_PVC <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_PVC$type1<-"PVC"
+data_long_PVC$type<-0
+data_long_PVC$type[grep("_N",data_long_PVC$condition)]="Neuro"        
+data_long_PVC$type[grep("_G",data_long_PVC$condition)]="non-Neuro"  
+data_long_PVC$type <- factor(data_long_PVC$type , levels = c("Neuro", "non-Neuro"))
+
+
+dat<-read.table(file='SuperAgerEpiMap.idmap.STG.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long_STG <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long_STG$type1<-"STG"
+data_long_STG$type<-0
+data_long_STG$type[grep("_N",data_long_STG$condition)]="Neuro"        
+data_long_STG$type[grep("_G",data_long_STG$condition)]="non-Neuro"  
+data_long_STG$type <- factor(data_long_STG$type , levels = c("Neuro", "non-Neuro"))
+
+data_long<-rbind(data_long_PFC,data_long_FG,data_long_IFG,data_long_PVC,data_long_STG)
+p<-ggplot(data_long, aes(x=type1, y=exp, fill=type))  +
+  geom_boxplot() +xlab("")+ ylab("Nornalized expression (TPM)")+ggtitle("") +
+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_color_npg() + scale_fill_npg()  + theme(legend.position='top')   + scale_fill_manual(values = c( "#80ACF9","#B4DAA8")) 
+p
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure.BrainMetalnc.22630.tmp.DE1_1.pdf", p,  width =6, height =6, units = "in", dpi = 300)
+
+### Figure S9b
+
+library(reshape2)
+library(ggplot2)
+library("ggsci")
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/LIBD/meta/GB_brain/neurocelltype")
+dat<-read.table(file='chrX_genes_results_genenames_SUB_TPM_filter_low.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long$type<-0
+data_long$type[grep("GLU",data_long$condition)]="Glutamatergic neuron"        
+data_long$type[grep("SOX",data_long$condition)]="GABAergic neuron"   
+data_long$type[grep("OLIG",data_long$condition)]="Oligodendrocyte"   
+
+
+data_long$type <- factor(data_long$type , levels = c("Glutamatergic neuron", "GABAergic neuron","Oligodendrocyte"))
+p<-ggplot(data_long, aes(x=type, y=exp, fill=type)) + geom_violin(trim = FALSE) +
+  geom_boxplot() +xlab("")+ ylab("Nornalized expression (TPM)")+ggtitle("") + scale_color_npg() + scale_fill_npg() +
+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  )  + theme(legend.position='top')     + scale_fill_manual(values = c("#E99C93","#80ACF9","#B4DAA8")) 
+p
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure.BrainMetalnc.22630.tmp.DE4.pdf", p,  width = 10, height =10, units = "in", dpi = 300)
+
+
+
+
+### Figure S9c
+
+library(reshape2)
+library(ggplot2)
+library("ggsci")
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/LIBD/meta/GB_brain")
+dat<-read.table(file='bulkRNA-seq.TPM.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long$type<-0
+data_long$type[grep("polya",data_long$condition)]="polyA"        
+data_long$type[grep("total",data_long$condition)]="total RNA"   
+
+data_long$type1<-0
+data_long$type1[grep("GW13",data_long$condition)]="GW13"        
+data_long$type1[grep("GW14.5",data_long$condition)]="GW14.5"   
+data_long$type1[grep("GW16",data_long$condition)]="GW16"        
+data_long$type1[grep("GW21",data_long$condition)]="GW21"  
+data_long$type1[grep("GW23",data_long$condition)]="GW23" 
+
+
+data_long$type <- factor(data_long$type , levels = c("polyA", "total RNA"))
+data_long$type1 <- factor(data_long$type1 , levels = c("GW13", "GW14.5","GW16","GW21","GW23"))
+p<-ggplot(data_long, aes(x=type1, y=exp, fill=type)) +
+  geom_bar(position="dodge", stat="identity") +xlab("")+ ylab("Nornalized expression (TPM)")+ggtitle("") + scale_color_npg() + scale_fill_npg() +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  )  + theme(legend.position='top')    + scale_fill_manual(values = c( "#80ACF9","#B4DAA8"))   
+p
+
+setwd("D:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure.BrainMetalnc.22630.tmp.DE3.pdf", p,  width = 6, height = 6, units = "in", dpi = 300)
+
+
+### Figure S9d
+
+
+library(reshape2)
+library(ggplot2)
+library("ggsci")
+setwd("I:/RUSH_AD/SCZ")
+dat<-read.table(file='chrX_genes_results_genenames_SUB_TPM_filter_low.txt',sep="\t",header=T);  
+dat<-dat[c("BrainMetalnc.22630"),]
+dat<-data.frame(id=rownames(dat),dat)
+data_long <- melt(dat,
+    id.vars=c("id"),
+    variable.name="condition",
+    value.name="exp"
+)
+
+data_long$type<-0
+data_long$type[grep("CON",data_long$condition)]="Control"        
+data_long$type[grep("SZ",data_long$condition)]="SCZ"   
+
+
+data_long$type <- factor(data_long$type , levels = c("Control", "SCZ"))
+p<-ggplot(data_long, aes(x=type, y=exp, fill=type))   +
+  geom_boxplot(width = 0.07) +xlab("")+ ylab("Nornalized expression (TPM)")+ggtitle("")  +
+  theme_bw() +
+  theme(
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    plot.background = element_rect(fill = "white"),
+    plot.title = element_text(size = 16, face = "bold")
+  ) + scale_color_npg() + scale_fill_npg() + theme(legend.position='top')    + scale_fill_manual(values = c( "#80ACF9","#B4DAA8"))  
+p
+
+setwd("F:/lncRNA/YangLab_lncRNAs/LCLKG/PsychENCODE/Figures/MS")
+ggsave("Figure.BrainMetalnc.22630.tmp.DE2.pdf", p,  width = 6, height = 6, units = "in", dpi = 300)
+
+
+#### Figure S10
+
+#### Figure S10a
+
+#### Figure S10b
+
+#### Figure S10s
+
+#### Figure S10d
+
+
+#### Figure S11
+
+
+#### Figure S12
+
